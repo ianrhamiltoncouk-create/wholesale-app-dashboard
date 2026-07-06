@@ -14,7 +14,7 @@
       padding: 2rem;
     }
     .dashboard-container {
-      max-width: 900px;
+      max-width: 950px;
       margin: 0 auto;
     }
     .header-card {
@@ -44,14 +44,14 @@
     .subtitle {
       color: #6d7175;
       font-size: 0.95rem;
-      margin: 0 0 1.5rem 0;
+      margin: 0;
       line-height: 1.5;
     }
     .grid-setup {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 1.25rem;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
     }
     .step-card {
       background: white;
@@ -61,6 +61,18 @@
       display: flex;
       flex-direction: column;
       box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      user-select: none;
+      position: relative;
+    }
+    .step-card:hover {
+      border-color: #008060;
+      transform: translateY(-2px);
+    }
+    .step-card.active {
+      border-color: #008060;
+      box-shadow: 0 0 0 2px #008060, 0 4px 12px rgba(0, 0, 0, 0.05);
     }
     .step-num {
       background: #f1f2f4;
@@ -74,6 +86,11 @@
       font-size: 0.9rem;
       font-weight: 700;
       margin-bottom: 1rem;
+      transition: all 0.2s ease;
+    }
+    .step-card.active .step-num {
+      background: #008060;
+      color: white;
     }
     .step-title {
       font-size: 1rem;
@@ -85,7 +102,7 @@
       font-size: 0.85rem;
       color: #6d7175;
       line-height: 1.4;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1rem;
       flex-grow: 1;
     }
     .btn-polaris {
@@ -112,25 +129,66 @@
     .btn-secondary:hover {
       background: #e4e6eb;
     }
-    .guide-card {
-      background: #f9fafb;
-      border: 1px dashed #e1e3e5;
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin-top: 1.5rem;
+    
+    /* Interactive instructions card */
+    .instruction-detail-card {
+      background: white;
+      border-radius: 12px;
+      padding: 2.25rem;
+      border: 1px solid #e1e3e5;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+      position: relative;
+      animation: fadeIn 0.3s ease-out;
     }
-    .guide-card h4 {
-      margin: 0 0 0.75rem 0;
+    .guide-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #1a1c1d;
+      margin: 0 0 1rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid #e1e3e5;
+      padding-bottom: 0.75rem;
+    }
+    .guide-section {
+      margin-bottom: 1.5rem;
+    }
+    .guide-section:last-child {
+      margin-bottom: 0;
+    }
+    .section-subtitle {
       font-size: 0.95rem;
       font-weight: 700;
       color: #202223;
+      margin: 0 0 0.5rem 0;
     }
-    .guide-card ol {
-      margin: 0;
-      padding-left: 1.25rem;
-      font-size: 0.85rem;
+    .section-body {
+      font-size: 0.875rem;
       color: #6d7175;
       line-height: 1.6;
+      margin: 0;
+    }
+    .section-body strong {
+      color: #1a1c1d;
+    }
+    .guide-badge {
+      background: #f1f2f4;
+      color: #4a4e51;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .guide-badge.why { background: #e4f0fc; color: #084c8c; }
+    .guide-badge.how { background: #fff4e5; color: #b25e00; }
+    .guide-badge.info { background: #e2f1e8; color: #108043; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
@@ -139,56 +197,63 @@
   <div class="dashboard-container">
     <!-- Header card -->
     <div class="header-card">
-      <span class="badge">App Installed</span>
+      <span class="badge">App Dashboard Active</span>
       <h1 class="main-title">Wholesale Configuration Portal</h1>
-      <p class="subtitle">Complete the 4 steps below to set up your bulk quantities, discount codes, and customer approval list.</p>
+      <p class="subtitle">Both widgets are successfully deployed. Select a step below to view detailed setups, rationale, and direct links.</p>
     </div>
 
-    <!-- 4 Step Grid -->
+    <!-- 4 Step Interactive Cards Grid -->
     <div class="grid-setup">
-      <!-- Step 1: Open Customizer -->
-      <div class="step-card">
+      <!-- Step 1 Card -->
+      <div class="step-card active" onclick="selectStep(1)" id="step-1-card">
         <div class="step-num">1</div>
         <h3 class="step-title">Open Editor</h3>
-        <p class="step-desc">Open the Shopify Theme Customizer where you will toggle ON the widgets and configure settings.</p>
-        <a href="#" id="link-customizer" class="btn-polaris" target="_top">Open Editor</a>
+        <p class="step-desc">Open the Theme Editor to enable the widgets globally.</p>
+        <a href="#" id="link-customizer" class="btn-polaris" target="_top">Open Customizer</a>
       </div>
 
-      <!-- Step 2: Edit Prices -->
-      <div class="step-card">
+      <!-- Step 2 Card -->
+      <div class="step-card" onclick="selectStep(2)" id="step-2-card">
         <div class="step-num">2</div>
-        <h3 class="step-title">Set Prices</h3>
-        <p class="step-desc">In the customizer sidebar under App embeds, select "Wholesale Auto-Pricing" to type your tier values.</p>
-        <button onclick="alert('Click Step 1 first, then click on the shapes icon (4th icon from top-left) and select Wholesale Auto-Pricing in the list!')" class="btn-polaris btn-secondary">Show How</button>
+        <h3 class="step-title">Configure Prices</h3>
+        <p class="step-desc">Set up your bulk tiers (quantity and discount percentages).</p>
+        <button class="btn-polaris btn-secondary" onclick="event.stopPropagation(); selectStep(2);">Show pricing guide</button>
       </div>
 
-      <!-- Step 3: Setup Shopify Discounts -->
-      <div class="step-card">
+      <!-- Step 3 Card -->
+      <div class="step-card" onclick="selectStep(3)" id="step-3-card">
         <div class="step-num">3</div>
-        <h3 class="step-title">Create Codes</h3>
-        <p class="step-desc">Create discount codes in your store admin (like <strong>BULK5</strong>) matching the values of your tiers.</p>
-        <a href="#" id="link-discounts" class="btn-polaris btn-secondary" target="_top">Create Discounts</a>
+        <h3 class="step-title">Create Discounts</h3>
+        <p class="step-desc">Map discount codes so they apply at checkout.</p>
+        <a href="#" id="link-discounts" class="btn-polaris btn-secondary" target="_top" onclick="event.stopPropagation();">Open Discounts</a>
       </div>
 
-      <!-- Step 4: Tag Customers -->
-      <div class="step-card">
+      <!-- Step 4 Card -->
+      <div class="step-card" onclick="selectStep(4)" id="step-4-card">
         <div class="step-num">4</div>
-        <h3 class="step-title">Tag Accounts</h3>
-        <p class="step-desc">Go to your customer profile list and add the tag <strong>wholesale</strong> to approve accounts.</p>
-        <a href="#" id="link-customers" class="btn-polaris btn-secondary" target="_top">Approve Users</a>
+        <h3 class="step-title">Approve Accounts</h3>
+        <p class="step-desc">Add tags to profiles to grant wholesale pricing.</p>
+        <a href="#" id="link-customers" class="btn-polaris btn-secondary" target="_top" onclick="event.stopPropagation();">Approve Users</a>
       </div>
     </div>
 
-    <!-- Pricing helper box -->
-    <div class="guide-card">
-      <h4>🔍 Detailed Guide: How to Edit Wholesale Tiers and Prices</h4>
-      <ol>
-        <li>Click the green <strong>Open Editor</strong> button in Step 1.</li>
-        <li>At the top-left of the Theme Customizer window, click the <strong>4th icon</strong> (the one showing shape symbols: a square, circle, and triangle). This opens the <strong>App embeds</strong> sidebar.</li>
-        <li>Switch the toggles to **ON** for both Wholesale Auto-Pricing and Cart Auto-Recovery.</li>
-        <li>Click directly on the text **"Wholesale Auto-Pricing"**.</li>
-        <li>A settings panel will slide open on the **right-hand side of your screen**! Change the quantities and discount percentages there, and click **Save** in the top right.</li>
-      </ol>
+    <!-- Dynamic Instruction Panel -->
+    <div class="instruction-detail-card" id="instructionPanel">
+      <!-- Will be updated dynamically by JS. Loading default step 1 info: -->
+      <h3 class="guide-title">
+        <span>Step 1: Open Theme Customizer & Toggle App Embeds</span>
+      </h3>
+      <div class="guide-section">
+        <h4 class="section-subtitle"><span class="guide-badge why">Why do this?</span> Activate the Widget Engine</h4>
+        <p class="section-body">Shopify Online Store 2.0 uses <strong>App Embeds</strong> to inject features securely without bloating or modifying your theme templates. Turning this toggle on allows our widgets to load automatically on your product and cart pages.</p>
+      </div>
+      <div class="guide-section">
+        <h4 class="section-subtitle"><span class="guide-badge how">How to do it?</span> 5-Second Setup</h4>
+        <p class="section-body">1. Click the green <strong>Open Customizer</strong> button in Step 1.<br>
+        2. At the top-left of the Theme Customizer window, click the <strong>4th icon</strong> (looks like shape patterns: square, circle, and triangle) to open the <strong>App embeds</strong> menu.<br>
+        3. Switch the toggles to **ON** for both **Wholesale Auto-Pricing** and **Cart Auto-Recovery**.<br>
+        4. Click **Save** in the top right.</p>
+      </div>
     </div>
   </div>
 
@@ -205,14 +270,125 @@
     const shopId = getCleanShopId(shop);
 
     // Update Deep-links dynamically based on the merchant's active store
-    if (shop) {
-      document.getElementById('link-customizer').href = `https://admin.shopify.com/store/${shopId}/themes/current/editor?context=apps`;
-      document.getElementById('link-customers').href = `https://admin.shopify.com/store/${shopId}/customers`;
-      document.getElementById('link-discounts').href = `https://admin.shopify.com/store/${shopId}/discounts`;
-    } else {
-      document.getElementById('link-customizer').href = 'https://admin.shopify.com/store/themes/current/editor?context=apps';
-      document.getElementById('link-customers').href = 'https://admin.shopify.com/store/customers';
-      document.getElementById('link-discounts').href = 'https://admin.shopify.com/store/discounts';
+    const customizerUrl = shop ? `https://admin.shopify.com/store/${shopId}/themes/current/editor?context=apps` : 'https://admin.shopify.com/store/themes/current/editor?context=apps';
+    const customersUrl = shop ? `https://admin.shopify.com/store/${shopId}/customers` : 'https://admin.shopify.com/store/customers';
+    const discountsUrl = shop ? `https://admin.shopify.com/store/${shopId}/discounts` : 'https://admin.shopify.com/store/discounts';
+
+    document.getElementById('link-customizer').href = customizerUrl;
+    document.getElementById('link-customers').href = customersUrl;
+    document.getElementById('link-discounts').href = discountsUrl;
+
+    // Define step guides content
+    const stepGuides = {
+      1: {
+        title: "Step 1: Open Theme Customizer & Toggle App Embeds",
+        why: {
+          badge: "Why do this?",
+          title: "Activate the Widget Engine",
+          desc: "Shopify uses <strong>App Embeds</strong> to inject app features securely without modifying your theme files. Turning this toggle on allows our widgets to load automatically on your product and cart pages."
+        },
+        how: {
+          badge: "How to do it?",
+          title: "5-Second Setup",
+          desc: "1. Click the green <strong>Open Customizer</strong> button in Step 1.<br>2. At the top-left of the Theme Customizer window, click the <strong>4th icon</strong> (the shapes icon) to open the <strong>App embeds</strong> menu.<br>3. Switch the toggles to **ON** for both <strong>Wholesale Auto-Pricing</strong> and <strong>Cart Auto-Recovery</strong>.<br>4. Click **Save** in the top right."
+        }
+      },
+      2: {
+        title: "Step 2: Configure Wholesale Pricing Tiers",
+        why: {
+          badge: "Why do this?",
+          title: "Specify Bulk Quantities & Discount Rates",
+          desc: "To make wholesale buying appealing, you must define your pricing tiers. This step tells the storefront widget exactly what volume levels (e.g., 5 items) correspond to what discount rates (e.g., 10% off) so it can display them to logged-in wholesalers."
+        },
+        how: {
+          badge: "How to do it?",
+          title: "Setting Your Values",
+          desc: "1. Inside the Theme Customizer (after turning App Embeds ON in Step 1), click directly on the text <strong>\"Wholesale Auto-Pricing\"</strong> in the left sidebar.<br>2. A settings panel will open on the <strong>right-hand side of your screen</strong>.<br>3. Look for the **Wholesale Tiers (Qty:Discount%)** input box.<br>4. Type your tiers in the format `MinQty:Discount%` separated by commas. For example: `5:10, 10:15, 20:20` means buying 5+ items gets 10% off, 10+ items gets 15% off, and 20+ items gets 20% off.<br>5. Click **Save** in the top right."
+        },
+        underHood: {
+          badge: "Under the Hood",
+          title: "Automated Discount Mapping",
+          desc: "Our app automatically maps these tiers to discount codes named `BULK[Qty]`. For example, setting a tier for quantity <strong>5</strong> tells our app to apply a Shopify discount code named <strong>BULK5</strong> at checkout. Proceed to Step 3 to register these codes!"
+        }
+      },
+      3: {
+        title: "Step 3: Create Matching Discount Codes in Shopify",
+        why: {
+          badge: "Why do this?",
+          title: "Authorize the Price Reductions at Checkout",
+          desc: "Our storefront widget beautifully calculates and displays bulk prices, and automatically applies the discount cookie in the customer's browser. However, **Shopify's checkout security will reject the discount unless you have registered the code in your Shopify Admin.**"
+        },
+        how: {
+          badge: "How to do it?",
+          title: "Creating the codes",
+          desc: `1. Click the <strong>Open Discounts</strong> button in Step 3.<br>
+          2. Click <strong>Create discount</strong> ➔ select <strong>Amount off products</strong>.<br>
+          3. Choose <strong>Discount code</strong> and name it exactly <strong>BULK5</strong> (matching your Tier 1).<br>
+          4. Under *Discount value*, enter <code>10%</code>.<br>
+          5. Under *Minimum purchase requirements*, select <strong>Minimum quantity of items</strong> and enter <code>5</code>.<br>
+          6. Under *Customer eligibility*, select *Specific customer segments* or customer tags to lock it to wholesale customers.<br>
+          7. Click <strong>Save</strong>. Repeat these steps to create <strong>BULK10</strong> (minimum quantity 10, value 15%).`
+        }
+      },
+      4: {
+        title: "Step 4: Approve Wholesale Customer Accounts",
+        why: {
+          badge: "Why do this?",
+          title: "Protect Your Profit Margins",
+          desc: "You don't want regular retail customers seeing your wholesale prices. By requiring a specific tag (e.g. `wholesale`), customers can register accounts normally, but they **cannot** see bulk pricing until you manually approve them."
+        },
+        how: {
+          badge: "How to do it?",
+          title: "Approving Accounts",
+          desc: `1. Click the <strong>Approve Users</strong> button in Step 4.<br>
+          2. Select the customer profile you want to approve.<br>
+          3. In their profile card on the right, find the **Tags** input field.<br>
+          4. Type in <code>wholesale</code> (or your custom tag) and press Enter.<br>
+          5. Click **Save**.<br>
+          6. The next time that customer logs in, the wholesale pricing grid and cart recovery options will immediately unlock for them!`
+        }
+      }
+    };
+
+    function selectStep(stepNum) {
+      // Toggle active classes on cards
+      for (let i = 1; i <= 4; i++) {
+        const card = document.getElementById(`step-${i}-card`);
+        if (i === stepNum) {
+          card.classList.add('active');
+        } else {
+          card.classList.remove('active');
+        }
+      }
+
+      // Update instructions panel content
+      const panel = document.getElementById('instructionPanel');
+      const data = stepGuides[stepNum];
+      
+      let html = `
+        <h3 class="guide-title">
+          <span>${data.title}</span>
+        </h3>
+        <div class="guide-section">
+          <h4 class="section-subtitle"><span class="guide-badge why">${data.why.badge}</span> ${data.why.title}</h4>
+          <p class="section-body">${data.why.desc}</p>
+        </div>
+        <div class="guide-section">
+          <h4 class="section-subtitle"><span class="guide-badge how">${data.how.badge}</span> ${data.how.title}</h4>
+          <p class="section-body">${data.how.desc}</p>
+        </div>
+      `;
+
+      if (data.underHood) {
+        html += `
+          <div class="guide-section">
+            <h4 class="section-subtitle"><span class="guide-badge info">${data.underHood.badge}</span> ${data.underHood.title}</h4>
+            <p class="section-body">${data.underHood.desc}</p>
+          </div>
+        `;
+      }
+
+      panel.innerHTML = html;
     }
   </script>
 </body>
