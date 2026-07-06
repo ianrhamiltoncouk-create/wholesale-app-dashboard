@@ -47,6 +47,42 @@
       margin: 0;
       line-height: 1.5;
     }
+    
+    /* Tabs styling */
+    .tabs-container {
+      display: flex;
+      border-bottom: 1px solid #e1e3e5;
+      margin-bottom: 1.5rem;
+      gap: 1.5rem;
+    }
+    .tab-button {
+      background: none;
+      border: none;
+      padding: 0.75rem 0.25rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #6d7175;
+      cursor: pointer;
+      position: relative;
+      transition: color 0.2s ease;
+    }
+    .tab-button:hover {
+      color: #1a1c1d;
+    }
+    .tab-button.active {
+      color: #008060;
+    }
+    .tab-button.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background-color: #008060;
+      border-radius: 99px;
+    }
+
     .grid-setup {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -197,63 +233,25 @@
   <div class="dashboard-container">
     <!-- Header card -->
     <div class="header-card">
-      <span class="badge">App Dashboard Active</span>
-      <h1 class="main-title">Wholesale Configuration Portal</h1>
-      <p class="subtitle">Both widgets are successfully deployed. Select a step below to view detailed setups, rationale, and direct links.</p>
+      <span class="badge">App Control Center</span>
+      <h1 class="main-title">Wholesale & Recovery Portal</h1>
+      <p class="subtitle">Select a widget type below to configure its settings, view guides, and deep-link directly to your Shopify sections.</p>
     </div>
 
-    <!-- 4 Step Interactive Cards Grid -->
-    <div class="grid-setup">
-      <!-- Step 1 Card -->
-      <div class="step-card active" onclick="selectStep(1)" id="step-1-card">
-        <div class="step-num">1</div>
-        <h3 class="step-title">Open Editor</h3>
-        <p class="step-desc">Open the Theme Editor to enable the widgets globally.</p>
-        <a href="#" id="link-customizer" class="btn-polaris" target="_top">Open Customizer</a>
-      </div>
+    <!-- Widgets Tab Bar -->
+    <div class="tabs-container">
+      <button class="tab-button active" id="tab-wholesale" onclick="switchWidgetTab('wholesale')">🏷️ Wholesale Pricing Grid</button>
+      <button class="tab-button" id="tab-recovery" onclick="switchWidgetTab('recovery')">🛒 Cart Abandonment Recovery</button>
+    </div>
 
-      <!-- Step 2 Card -->
-      <div class="step-card" onclick="selectStep(2)" id="step-2-card">
-        <div class="step-num">2</div>
-        <h3 class="step-title">Configure Prices</h3>
-        <p class="step-desc">Set up your bulk tiers (quantity and discount percentages).</p>
-        <button class="btn-polaris btn-secondary" onclick="event.stopPropagation(); selectStep(2);">Show pricing guide</button>
-      </div>
-
-      <!-- Step 3 Card -->
-      <div class="step-card" onclick="selectStep(3)" id="step-3-card">
-        <div class="step-num">3</div>
-        <h3 class="step-title">Create Discounts</h3>
-        <p class="step-desc">Map discount codes so they apply at checkout.</p>
-        <a href="#" id="link-discounts" class="btn-polaris btn-secondary" target="_top" onclick="event.stopPropagation();">Open Discounts</a>
-      </div>
-
-      <!-- Step 4 Card -->
-      <div class="step-card" onclick="selectStep(4)" id="step-4-card">
-        <div class="step-num">4</div>
-        <h3 class="step-title">Approve Accounts</h3>
-        <p class="step-desc">Add tags to profiles to grant wholesale pricing.</p>
-        <a href="#" id="link-customers" class="btn-polaris btn-secondary" target="_top" onclick="event.stopPropagation();">Approve Users</a>
-      </div>
+    <!-- Active Step Cards Panel (Populated by JS) -->
+    <div class="grid-setup" id="stepsGrid">
+      <!-- Grid items loaded dynamically -->
     </div>
 
     <!-- Dynamic Instruction Panel -->
     <div class="instruction-detail-card" id="instructionPanel">
-      <!-- Will be updated dynamically by JS. Loading default step 1 info: -->
-      <h3 class="guide-title">
-        <span>Step 1: Open Theme Customizer & Toggle App Embeds</span>
-      </h3>
-      <div class="guide-section">
-        <h4 class="section-subtitle"><span class="guide-badge why">Why do this?</span> Activate the Widget Engine</h4>
-        <p class="section-body">Shopify Online Store 2.0 uses <strong>App Embeds</strong> to inject features securely without bloating or modifying your theme templates. Turning this toggle on allows our widgets to load automatically on your product and cart pages.</p>
-      </div>
-      <div class="guide-section">
-        <h4 class="section-subtitle"><span class="guide-badge how">How to do it?</span> 5-Second Setup</h4>
-        <p class="section-body">1. Click the green <strong>Open Customizer</strong> button in Step 1.<br>
-        2. At the top-left of the Theme Customizer window, click the <strong>4th icon</strong> (looks like shape patterns: square, circle, and triangle) to open the <strong>App embeds</strong> menu.<br>
-        3. Switch the toggles to **ON** for both **Wholesale Auto-Pricing** and **Cart Auto-Recovery**.<br>
-        4. Click **Save** in the top right.</p>
-      </div>
+      <!-- Loaded dynamically by JS -->
     </div>
   </div>
 
@@ -269,17 +267,39 @@
     
     const shopId = getCleanShopId(shop);
 
-    // Update Deep-links dynamically based on the merchant's active store
     const customizerUrl = shop ? `https://admin.shopify.com/store/${shopId}/themes/current/editor?context=apps` : 'https://admin.shopify.com/store/themes/current/editor?context=apps';
     const customersUrl = shop ? `https://admin.shopify.com/store/${shopId}/customers` : 'https://admin.shopify.com/store/customers';
     const discountsUrl = shop ? `https://admin.shopify.com/store/${shopId}/discounts` : 'https://admin.shopify.com/store/discounts';
 
-    document.getElementById('link-customizer').href = customizerUrl;
-    document.getElementById('link-customers').href = customersUrl;
-    document.getElementById('link-discounts').href = discountsUrl;
+    // Current State
+    let activeTab = 'wholesale';
+    let activeStep = 1;
 
-    // Define step guides content
-    const stepGuides = {
+    // Wholesale configuration data
+    const wholesaleSteps = [
+      {
+        title: "Open Editor",
+        desc: "Open the Theme Editor to enable the widgets globally.",
+        btnHtml: `<a href="${customizerUrl}" class="btn-polaris" target="_top">Open Editor</a>`
+      },
+      {
+        title: "Configure Tiers",
+        desc: "Set up your bulk tiers (quantity and discount percentages).",
+        btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(2)">Show pricing guide</button>`
+      },
+      {
+        title: "Create Discounts",
+        desc: "Map discount codes so they apply at checkout.",
+        btnHtml: `<a href="${discountsUrl}" class="btn-polaris btn-secondary" target="_top">Create Discounts</a>`
+      },
+      {
+        title: "Approve Accounts",
+        desc: "Add tags to profiles to grant wholesale pricing.",
+        btnHtml: `<a href="${customersUrl}" class="btn-polaris btn-secondary" target="_top">Approve Users</a>`
+      }
+    ];
+
+    const wholesaleGuides = {
       1: {
         title: "Step 1: Open Theme Customizer & Toggle App Embeds",
         why: {
@@ -290,7 +310,7 @@
         how: {
           badge: "How to do it?",
           title: "5-Second Setup",
-          desc: "1. Click the green <strong>Open Customizer</strong> button in Step 1.<br>2. At the top-left of the Theme Customizer window, click the <strong>4th icon</strong> (the shapes icon) to open the <strong>App embeds</strong> menu.<br>3. Switch the toggles to **ON** for both <strong>Wholesale Auto-Pricing</strong> and <strong>Cart Auto-Recovery</strong>.<br>4. Click **Save** in the top right."
+          desc: "1. Click the green <strong>Open Editor</strong> button in Step 1.<br>2. At the top-left of the Theme Customizer window, click the <strong>4th icon</strong> (the shapes icon) to open the <strong>App embeds</strong> menu.<br>3. Switch the toggles to **ON** for both <strong>Wholesale Auto-Pricing</strong> and <strong>Cart Auto-Recovery</strong>.<br>4. Click **Save** in the top right."
         }
       },
       2: {
@@ -302,7 +322,7 @@
         },
         how: {
           badge: "How to do it?",
-          title: "Setting Your Values",
+          title: "Setting Your Tiers",
           desc: "1. Inside the Theme Customizer (after turning App Embeds ON in Step 1), click directly on the text <strong>\"Wholesale Auto-Pricing\"</strong> in the left sidebar.<br>2. A settings panel will open on the <strong>right-hand side of your screen</strong>.<br>3. Look for the **Wholesale Tiers (Qty:Discount%)** input box.<br>4. Type your tiers in the format `MinQty:Discount%` separated by commas. For example: `5:10, 10:15, 20:20` means buying 5+ items gets 10% off, 10+ items gets 15% off, and 20+ items gets 20% off.<br>5. Click **Save** in the top right."
         },
         underHood: {
@@ -321,7 +341,7 @@
         how: {
           badge: "How to do it?",
           title: "Creating the codes",
-          desc: `1. Click the <strong>Open Discounts</strong> button in Step 3.<br>
+          desc: `1. Click the <strong>Create Discounts</strong> button in Step 3.<br>
           2. Click <strong>Create discount</strong> ➔ select <strong>Amount off products</strong>.<br>
           3. Choose <strong>Discount code</strong> and name it exactly <strong>BULK5</strong> (matching your Tier 1).<br>
           4. Under *Discount value*, enter <code>10%</code>.<br>
@@ -350,20 +370,123 @@
       }
     };
 
+    // Recovery configuration data
+    const recoverySteps = [
+      {
+        title: "Enable Recovery",
+        desc: "Open the Theme Editor and turn the Cart Auto-Recovery toggle ON.",
+        btnHtml: `<a href="${customizerUrl}" class="btn-polaris" target="_top">Open Editor</a>`
+      },
+      {
+        title: "Choose Method",
+        desc: "Configure manual emails (Free) or automated API Webhooks.",
+        btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(2)">Show automation guide</button>`
+      },
+      {
+        title: "Test Exit Intent",
+        desc: "Simulate a leaving customer on your storefront to test.",
+        btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(3)">Show testing steps</button>`
+      }
+    ];
+
+    const recoveryGuides = {
+      1: {
+        title: "Step 1: Open Theme Customizer & Toggle Cart Auto-Recovery",
+        why: {
+          badge: "Why do this?",
+          title: "Monitor Cart States & Catch Leaving Visitors",
+          desc: "Activating the recovery script enables the exit-intent detector globally and dynamically places the 'Request Quote' button directly beneath the checkout button on your Cart page without modifying code."
+        },
+        how: {
+          badge: "How to do it?",
+          title: "Enable App Embed",
+          desc: "1. Click the green <strong>Open Editor</strong> button in Step 1.<br>2. At the top-left of the Theme Customizer window, click the <strong>4th icon</strong> (the shapes icon) to open the <strong>App embeds</strong> sidebar.<br>3. Toggle **Cart Auto-Recovery** to **ON**.<br>4. Click **Save** in the top right."
+        }
+      },
+      2: {
+        title: "Step 2: Choose Recovery Flow (Manual Emails vs. Auto Webhooks)",
+        why: {
+          badge: "Why do this?",
+          title: "Decide How Quote Requests Are Processed",
+          desc: "When a customer requests an invoice, you need a way to receive and process it. You can review and process these requests manually via email for free, or set up a webhook to automate creating draft invoices."
+        },
+        how: {
+          badge: "Your Two Options",
+          title: "Manual (Free) or Webhook (Automated)",
+          desc: `<strong>Option A: Free/Manual Flow (No Setup Required):</strong><br>
+          Leave the <strong>Webhook URL</strong> setting blank inside the customizer. When a customer submits a quote, our widget automatically sends an email to you containing their name, company, email, and a structured text list of their items (including quantities and variant IDs). You can then manually create a Draft Order in your Shopify Admin.<br><br>
+          
+          <strong>Option B: Webhook Automation (Zapier / Make.com):</strong><br>
+          1. Create a webhook in Zapier or Make.com.<br>
+          2. Enter the webhook URL inside the **Webhook URL** field in the Theme Customizer settings of your Cart Auto-Recovery block.<br>
+          3. Set your webhook flow to receive our JSON payload (which includes Customer Email, Company, Notes, and a clean list of variant IDs + quantities) and trigger Shopify's <strong>Create Draft Order</strong> and <strong>Send Invoice</strong> API endpoints.`
+        }
+      },
+      3: {
+        title: "Step 3: Test Exit Intent and Cart Buttons on Storefront",
+        why: {
+          badge: "Why do this?",
+          title: "Validate the Customer Experience",
+          desc: "Testing ensures that both the direct checkout page button and the exit-intent popup behave perfectly before your wholesalers use them."
+        },
+        how: {
+          badge: "How to test",
+          title: "Simulate Cart Abandonment",
+          desc: `1. Open a new private browser window and visit your storefront.<br>
+          2. Add any product to your cart.<br>
+          3. **Test Cart Page Button:** Go to <code>/cart</code>. You should see a secondary button labeled <strong>"Request Wholesale Invoice"</strong> automatically placed below your checkout button. Click it to open the form.<br>
+          4. **Test Exit-Intent:** Navigate to any page with items in your cart. Move your mouse cursor rapidly to the top of the browser tab (simulating closing the tab). A beautiful popup modal will slide open prompting you to save your items!`
+        }
+      }
+    };
+
+    function switchWidgetTab(tabName) {
+      activeTab = tabName;
+      activeStep = 1;
+      
+      // Update Tab Button styles
+      document.getElementById('tab-wholesale').classList.toggle('active', tabName === 'wholesale');
+      document.getElementById('tab-recovery').classList.toggle('active', tabName === 'recovery');
+      
+      renderStepCards();
+      selectStep(1);
+    }
+
+    function renderStepCards() {
+      const grid = document.getElementById('stepsGrid');
+      const steps = activeTab === 'wholesale' ? wholesaleSteps : recoverySteps;
+      
+      let html = '';
+      steps.forEach((step, index) => {
+        const stepNum = index + 1;
+        html += `
+          <div class="step-card ${stepNum === activeStep ? 'active' : ''}" onclick="selectStep(${stepNum})" id="step-${stepNum}-card">
+            <div class="step-num">${stepNum}</div>
+            <h3 class="step-title">${step.title}</h3>
+            <p class="step-desc">${step.desc}</p>
+            <div onclick="event.stopPropagation();">${step.btnHtml}</div>
+          </div>
+        `;
+      });
+      
+      grid.innerHTML = html;
+    }
+
     function selectStep(stepNum) {
+      activeStep = stepNum;
+      
       // Toggle active classes on cards
-      for (let i = 1; i <= 4; i++) {
+      const stepsCount = activeTab === 'wholesale' ? wholesaleSteps.length : recoverySteps.length;
+      for (let i = 1; i <= stepsCount; i++) {
         const card = document.getElementById(`step-${i}-card`);
-        if (i === stepNum) {
-          card.classList.add('active');
-        } else {
-          card.classList.remove('active');
+        if (card) {
+          card.classList.toggle('active', i === stepNum);
         }
       }
 
       // Update instructions panel content
       const panel = document.getElementById('instructionPanel');
-      const data = stepGuides[stepNum];
+      const data = activeTab === 'wholesale' ? wholesaleGuides[stepNum] : recoveryGuides[stepNum];
       
       let html = `
         <h3 class="guide-title">
@@ -390,6 +513,9 @@
 
       panel.innerHTML = html;
     }
+
+    // Initial Load
+    switchWidgetTab('wholesale');
   </script>
 </body>
 </html>
