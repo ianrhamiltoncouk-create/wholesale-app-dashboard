@@ -14,7 +14,7 @@
       padding: 2rem;
     }
     .dashboard-container {
-      max-width: 800px;
+      max-width: 900px;
       margin: 0 auto;
     }
     .header-card {
@@ -49,7 +49,7 @@
     }
     .grid-setup {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 1.25rem;
       margin-bottom: 2rem;
     }
@@ -116,64 +116,79 @@
       background: #f9fafb;
       border: 1px dashed #e1e3e5;
       border-radius: 8px;
-      padding: 1.25rem;
-      margin-top: 2rem;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
     }
     .guide-card h4 {
-      margin: 0 0 0.5rem 0;
-      font-size: 0.9rem;
+      margin: 0 0 0.75rem 0;
+      font-size: 0.95rem;
       font-weight: 700;
       color: #202223;
     }
-    .guide-card p {
-      font-size: 0.825rem;
-      color: #6d7175;
+    .guide-card ol {
       margin: 0;
-      line-height: 1.4;
+      padding-left: 1.25rem;
+      font-size: 0.85rem;
+      color: #6d7175;
+      line-height: 1.6;
     }
   </style>
 </head>
 <body>
 
   <div class="dashboard-container">
-    <!-- Header banner -->
+    <!-- Header card -->
     <div class="header-card">
-      <span class="badge">App Active</span>
-      <h1 class="main-title">Wholesale & Cart Recovery Portal</h1>
-      <p class="subtitle">Welcome to your app dashboard! Both your Wholesale Tiers widget and Cart Abandonment Recovery widgets are installed. Follow the quick steps below to configure them directly in your theme.</p>
+      <span class="badge">App Installed</span>
+      <h1 class="main-title">Wholesale Configuration Portal</h1>
+      <p class="subtitle">Complete the 4 steps below to set up your bulk quantities, discount codes, and customer approval list.</p>
     </div>
 
-    <!-- 3 Step Quickstart Grid -->
+    <!-- 4 Step Grid -->
     <div class="grid-setup">
-      <!-- Step 1: Theme Editor -->
+      <!-- Step 1: Open Customizer -->
       <div class="step-card">
         <div class="step-num">1</div>
-        <h3 class="step-title">Enable Widgets</h3>
-        <p class="step-desc">Open your Theme Customizer and toggle ON the widgets in the App embeds panel to show them on your product and cart pages.</p>
-        <a href="#" id="link-customizer" class="btn-polaris" target="_top">Open Customizer</a>
+        <h3 class="step-title">Open Editor</h3>
+        <p class="step-desc">Open the Shopify Theme Customizer where you will toggle ON the widgets and configure settings.</p>
+        <a href="#" id="link-customizer" class="btn-polaris" target="_top">Open Editor</a>
       </div>
 
-      <!-- Step 2: Customer tags -->
+      <!-- Step 2: Edit Prices -->
       <div class="step-card">
         <div class="step-num">2</div>
-        <h3 class="step-title">Tag Customers</h3>
-        <p class="step-desc">Open your customer list and add the tag <strong>wholesale</strong> to any accounts you want to grant bulk pricing access to.</p>
-        <a href="#" id="link-customers" class="btn-polaris btn-secondary" target="_top">Manage Customers</a>
+        <h3 class="step-title">Set Prices</h3>
+        <p class="step-desc">In the customizer sidebar under App embeds, select "Wholesale Auto-Pricing" to type your tier values.</p>
+        <button onclick="alert('Click Step 1 first, then click on the shapes icon (4th icon from top-left) and select Wholesale Auto-Pricing in the list!')" class="btn-polaris btn-secondary">Show How</button>
       </div>
 
-      <!-- Step 3: Discounts mapping -->
+      <!-- Step 3: Setup Shopify Discounts -->
       <div class="step-card">
         <div class="step-num">3</div>
-        <h3 class="step-title">Discounts Setup</h3>
-        <p class="step-desc">Create your automatic quantity discounts or standard discount codes (e.g. <strong>BULK5</strong> and <strong>BULK10</strong>) in your admin.</p>
-        <a href="#" id="link-discounts" class="btn-polaris btn-secondary" target="_top">Setup Discounts</a>
+        <h3 class="step-title">Create Codes</h3>
+        <p class="step-desc">Create discount codes in your store admin (like <strong>BULK5</strong>) matching the values of your tiers.</p>
+        <a href="#" id="link-discounts" class="btn-polaris btn-secondary" target="_top">Create Discounts</a>
+      </div>
+
+      <!-- Step 4: Tag Customers -->
+      <div class="step-card">
+        <div class="step-num">4</div>
+        <h3 class="step-title">Tag Accounts</h3>
+        <p class="step-desc">Go to your customer profile list and add the tag <strong>wholesale</strong> to approve accounts.</p>
+        <a href="#" id="link-customers" class="btn-polaris btn-secondary" target="_top">Approve Users</a>
       </div>
     </div>
 
-    <!-- Troubleshooting Guide -->
+    <!-- Pricing helper box -->
     <div class="guide-card">
-      <h4>💡 Need Help or Custom Automation?</h4>
-      <p>If you'd like your abandoned carts to automatically create draft invoices and email them directly to your customers, enter your webhook URL (from Zapier or Make.com) into the settings panel of the <strong>Cart Auto-Recovery</strong> App Embed widget.</p>
+      <h4>🔍 Detailed Guide: How to Edit Wholesale Tiers and Prices</h4>
+      <ol>
+        <li>Click the green <strong>Open Editor</strong> button in Step 1.</li>
+        <li>At the top-left of the Theme Customizer window, click the <strong>4th icon</strong> (the one showing shape symbols: a square, circle, and triangle). This opens the <strong>App embeds</strong> sidebar.</li>
+        <li>Switch the toggles to **ON** for both Wholesale Auto-Pricing and Cart Auto-Recovery.</li>
+        <li>Click directly on the text **"Wholesale Auto-Pricing"**.</li>
+        <li>A settings panel will slide open on the **right-hand side of your screen**! Change the quantities and discount percentages there, and click **Save** in the top right.</li>
+      </ol>
     </div>
   </div>
 
@@ -182,10 +197,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     const shop = urlParams.get('shop') || '';
     
-    // Parse store name or ID from URL
     const getCleanShopId = (shopDomain) => {
-      // In new admin layout, it's admin.shopify.com/store/STORE-ID
-      // If we don't have store ID, we fallback to shopDomain
       if (!shopDomain) return 'your-store';
       return shopDomain.split('.')[0];
     };
@@ -198,7 +210,6 @@
       document.getElementById('link-customers').href = `https://admin.shopify.com/store/${shopId}/customers`;
       document.getElementById('link-discounts').href = `https://admin.shopify.com/store/${shopId}/discounts`;
     } else {
-      // General fallbacks if shop is missing
       document.getElementById('link-customizer').href = 'https://admin.shopify.com/store/themes/current/editor?context=apps';
       document.getElementById('link-customers').href = 'https://admin.shopify.com/store/customers';
       document.getElementById('link-discounts').href = 'https://admin.shopify.com/store/discounts';
