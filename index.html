@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wholesale Bulk Orders Admin</title>
+  <!-- Shopify Polaris Stylesheet for native Shopify Admin look -->
+  <link rel="stylesheet" href="https://unpkg.com/@shopify/polaris@12.0.0/build/esm/styles.css">
+  <style>
+    body {
+      background-color: #f6f6f7;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 2rem;
+    }
+    .dashboard-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .header-card {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      border: 1px solid #e1e3e5;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .badge {
+      background: #e2f1e8;
+      color: #108043;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: inline-block;
+      margin-bottom: 0.75rem;
+    }
+    .main-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem 0;
+      color: #1a1c1d;
+    }
+    .subtitle {
+      color: #6d7175;
+      font-size: 0.95rem;
+      margin: 0 0 1.5rem 0;
+      line-height: 1.5;
+    }
+    .grid-setup {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .step-card {
+      background: white;
+      border-radius: 10px;
+      padding: 1.5rem;
+      border: 1px solid #e1e3e5;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+    .step-num {
+      background: #f1f2f4;
+      color: #4a4e51;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    .step-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem 0;
+      color: #1a1c1d;
+    }
+    .step-desc {
+      font-size: 0.85rem;
+      color: #6d7175;
+      line-height: 1.4;
+      margin-bottom: 1.25rem;
+      flex-grow: 1;
+    }
+    .btn-polaris {
+      background: #008060;
+      color: white;
+      border: none;
+      padding: 0.65rem 1.25rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.2s ease;
+    }
+    .btn-polaris:hover {
+      background: #006e52;
+    }
+    .btn-secondary {
+      background: #f1f2f4;
+      color: #202223;
+    }
+    .btn-secondary:hover {
+      background: #e4e6eb;
+    }
+    .guide-card {
+      background: #f9fafb;
+      border: 1px dashed #e1e3e5;
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-top: 2rem;
+    }
+    .guide-card h4 {
+      margin: 0 0 0.5rem 0;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #202223;
+    }
+    .guide-card p {
+      font-size: 0.825rem;
+      color: #6d7175;
+      margin: 0;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard-container">
+    <!-- Header banner -->
+    <div class="header-card">
+      <span class="badge">App Active</span>
+      <h1 class="main-title">Wholesale & Cart Recovery Portal</h1>
+      <p class="subtitle">Welcome to your app dashboard! Both your Wholesale Tiers widget and Cart Abandonment Recovery widgets are installed. Follow the quick steps below to configure them directly in your theme.</p>
+    </div>
+
+    <!-- 3 Step Quickstart Grid -->
+    <div class="grid-setup">
+      <!-- Step 1: Theme Editor -->
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <h3 class="step-title">Enable Widgets</h3>
+        <p class="step-desc">Open your Theme Customizer and toggle ON the widgets in the App embeds panel to show them on your product and cart pages.</p>
+        <a href="#" id="link-customizer" class="btn-polaris" target="_top">Open Customizer</a>
+      </div>
+
+      <!-- Step 2: Customer tags -->
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <h3 class="step-title">Tag Customers</h3>
+        <p class="step-desc">Open your customer list and add the tag <strong>wholesale</strong> to any accounts you want to grant bulk pricing access to.</p>
+        <a href="#" id="link-customers" class="btn-polaris btn-secondary" target="_top">Manage Customers</a>
+      </div>
+
+      <!-- Step 3: Discounts mapping -->
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <h3 class="step-title">Discounts Setup</h3>
+        <p class="step-desc">Create your automatic quantity discounts or standard discount codes (e.g. <strong>BULK5</strong> and <strong>BULK10</strong>) in your admin.</p>
+        <a href="#" id="link-discounts" class="btn-polaris btn-secondary" target="_top">Setup Discounts</a>
+      </div>
+    </div>
+
+    <!-- Troubleshooting Guide -->
+    <div class="guide-card">
+      <h4>💡 Need Help or Custom Automation?</h4>
+      <p>If you'd like your abandoned carts to automatically create draft invoices and email them directly to your customers, enter your webhook URL (from Zapier or Make.com) into the settings panel of the <strong>Cart Auto-Recovery</strong> App Embed widget.</p>
+    </div>
+  </div>
+
+  <script>
+    // Get the shop domain name from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const shop = urlParams.get('shop') || '';
+    
+    // Parse store name or ID from URL
+    const getCleanShopId = (shopDomain) => {
+      // In new admin layout, it's admin.shopify.com/store/STORE-ID
+      // If we don't have store ID, we fallback to shopDomain
+      if (!shopDomain) return 'your-store';
+      return shopDomain.split('.')[0];
+    };
+    
+    const shopId = getCleanShopId(shop);
+
+    // Update Deep-links dynamically based on the merchant's active store
+    if (shop) {
+      document.getElementById('link-customizer').href = `https://admin.shopify.com/store/${shopId}/themes/current/editor?context=apps`;
+      document.getElementById('link-customers').href = `https://admin.shopify.com/store/${shopId}/customers`;
+      document.getElementById('link-discounts').href = `https://admin.shopify.com/store/${shopId}/discounts`;
+    } else {
+      // General fallbacks if shop is missing
+      document.getElementById('link-customizer').href = 'https://admin.shopify.com/store/themes/current/editor?context=apps';
+      document.getElementById('link-customers').href = 'https://admin.shopify.com/store/customers';
+      document.getElementById('link-discounts').href = 'https://admin.shopify.com/store/discounts';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+# Shopify Theme App Extension Configuration
+# This file is used to configure your extension.
+
+name = "wholesale-pricing-extension"
+type = "theme"
+uid = "07099bf9-4a18-3cf1-1b6a-bc1b6938f3f604200317"

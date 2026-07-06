@@ -1,0 +1,487 @@
+{% comment %}
+  Wholesale Cart Quote & Draft Order Request (App Embed Version with Auto-Injection)
+  Automatically triggers exit intent site-wide and injects a "Request Quote" button on the cart page.
+  Zero code editing required from the merchant.
+  Schema optimized for App Embed limitations (max 6 settings).
+{% endcomment %}
+
+<!-- Modal Backdrop & Card HTML (Renders globally in body) -->
+<div class="cart-quote-section" id="cart-quote-{{ block.id }}" data-block-id="{{ block.id }}">
+  <!-- Modal Template -->
+  <div class="quote-modal-backdrop" id="quoteModal">
+    <div class="quote-modal-card">
+      <button type="button" class="quote-modal-close" onclick="closeCartQuoteModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="close-icon">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div class="quote-modal-grid">
+        <!-- Left Side: Cart Items Summary -->
+        <div class="quote-modal-cart-summary">
+          <h4 class="summary-title">Draft Invoice Items</h4>
+          <div class="summary-items-list" id="quoteCartItemsList">
+            <p class="summary-loading">Loading your cart...</p>
+          </div>
+          <div class="summary-total-row">
+            <span>Cart Subtotal</span>
+            <strong id="quoteCartSubtotal">$0.00</strong>
+          </div>
+        </div>
+
+        <!-- Right Side: Contact & Details Form -->
+        <div class="quote-modal-form-wrapper">
+          <div class="form-header">
+            <span class="form-tag">Abandonment Recovery</span>
+            <h3 class="form-title">{{ block.settings.heading | default: "Save Your Cart as an Invoice Quote" | escape }}</h3>
+            <p class="form-subheading">{{ block.settings.subheading | default: "Submit your wholesale cart details, and our sales team will email you a custom invoice draft." | escape }}</p>
+          </div>
+
+          <!-- Success Screen -->
+          <div class="quote-success-screen" style="display: none;" id="quoteSuccessScreen">
+            <div class="success-checkmark-wrapper">
+              <svg viewBox="0 0 20 20" fill="currentColor" class="success-icon">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <h4>Quote Request Received</h4>
+            <p>Your request has been successfully recorded. We will review your wholesale quantities and email a draft invoice link to your inbox shortly.</p>
+            <button type="button" class="quote-success-close-btn" onclick="closeCartQuoteModal()">Close Window</button>
+          </div>
+
+          <!-- Contact Form -->
+          {% form 'contact', id: 'quoteRequestForm', class: 'quote-form' %}
+            {% if form.posted_successfully? %}
+              <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                  document.getElementById('quoteRequestForm').style.display = 'none';
+                  document.getElementById('quoteSuccessScreen').style.display = 'flex';
+                });
+              </script>
+            {% endif %}
+
+            <input type="hidden" name="contact[form_name]" value="Wholesale Draft Order Request">
+            <textarea name="contact[body]" id="quoteHiddenCartDetails" style="display: none;" required></textarea>
+
+            <div class="field-group">
+              <label for="quote-email">Email Address *</label>
+              <input type="email" 
+                     id="quote-email" 
+                     name="contact[email]" 
+                     class="field-input" 
+                     placeholder="email@example.com" 
+                     value="{% if customer %}{{ customer.email }}{% endif %}" 
+                     required>
+            </div>
+
+            <div class="field-row">
+              <div class="field-group">
+                <label for="quote-name">Full Name</label>
+                <input type="text" 
+                       id="quote-name" 
+                       name="contact[name]" 
+                       class="field-input" 
+                       placeholder="John Doe" 
+                       value="{% if customer %}{{ customer.name }}{% endif %}">
+              </div>
+              <div class="field-group">
+                <label for="quote-company">Company</label>
+                <input type="text" 
+                       id="quote-company" 
+                       name="contact[company]" 
+                       class="field-input" 
+                       placeholder="Acme Corp">
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label for="quote-note">Add wholesale instructions or custom details...</label>
+              <textarea id="quote-note" 
+                        name="contact[merchant_note]" 
+                        class="field-input field-textarea" 
+                        placeholder="e.g. Please calculate custom shipping terms..."></textarea>
+            </div>
+
+            <button type="submit" class="quote-submit-btn" id="quoteSubmitBtn">
+              <span class="btn-text">Send Invoice Request</span>
+              <span class="btn-spinner" style="display: none;"></span>
+            </button>
+          {% endform %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .cart-quote-section {
+    --mq-bg: var(--gradient-background, #ffffff);
+    --mq-text: rgba(var(--color-foreground), 0.75);
+    --mq-accent: #10b981;
+    --mq-border: rgba(var(--color-foreground), 0.08);
+    --mq-text-light: rgba(var(--color-foreground), 0.5);
+    --mq-radius: 14px;
+    --mq-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .cart-quote-trigger-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: transparent;
+    border: 2px solid var(--mq-accent);
+    color: var(--mq-accent);
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: var(--mq-transition);
+    width: 100%;
+    margin-top: 0.75rem;
+  }
+  .cart-quote-trigger-btn:hover {
+    background: var(--mq-accent);
+    color: white;
+  }
+  .cart-quote-trigger-btn .btn-icon { width: 16px; height: 16px; }
+
+  .quote-modal-backdrop {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 999999;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+  }
+  .quote-modal-backdrop.is-open { opacity: 1; pointer-events: auto; }
+
+  .quote-modal-card {
+    background: var(--mq-bg);
+    width: 90%; max-width: 800px;
+    border-radius: var(--mq-radius);
+    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+    position: relative; overflow: hidden;
+    transform: scale(0.95); transition: transform 0.3s ease;
+    border: 1px solid var(--mq-border);
+  }
+  .quote-modal-backdrop.is-open .quote-modal-card { transform: scale(1); }
+
+  .quote-modal-close {
+    position: absolute; top: 1rem; right: 1rem;
+    background: transparent; border: none;
+    color: var(--mq-text-light); cursor: pointer;
+    z-index: 10; padding: 0.25rem; border-radius: 50%;
+  }
+  .quote-modal-close:hover { color: rgba(var(--color-foreground), 0.9); background: rgba(0,0,0,0.05); }
+  .quote-modal-close .close-icon { width: 18px; height: 18px; }
+
+  .quote-modal-grid { display: grid; grid-template-columns: 1fr; }
+  @media (min-width: 640px) { .quote-modal-grid { grid-template-columns: 300px 1fr; } }
+
+  .quote-modal-cart-summary {
+    background: rgba(var(--color-foreground), 0.02); border-right: 1px solid var(--mq-border);
+    padding: 1.5rem; display: flex; flex-direction: column; max-height: 480px;
+  }
+  .summary-title { font-size: 0.9rem; font-weight: 700; margin: 0 0 1rem 0; color: var(--mq-text-light); }
+  .summary-items-list { flex-grow: 1; overflow-y: auto; margin-bottom: 1rem; }
+  .summary-loading { font-size: 0.8rem; color: var(--mq-text-light); font-style: italic; }
+
+  .quote-cart-item { display: flex; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid rgba(var(--color-foreground), 0.04); }
+  .quote-cart-item:last-child { border-bottom: none; }
+  .item-img { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; border: 1px solid var(--mq-border); }
+  .item-info { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
+  .item-name { font-size: 0.75rem; font-weight: 600; margin: 0; color: inherit; line-height: 1.2; }
+  .item-meta { font-size: 0.65rem; color: var(--mq-text-light); }
+  .item-price { font-size: 0.75rem; font-weight: 700; align-self: center; }
+
+  .summary-total-row { border-top: 1.5px solid var(--mq-border); padding-top: 0.75rem; display: flex; justify-content: space-between; font-size: 0.85rem; }
+  .summary-total-row strong { font-size: 1rem; color: var(--mq-accent); }
+
+  .quote-modal-form-wrapper { padding: 1.75rem; display: flex; flex-direction: column; justify-content: center; }
+  .form-header { margin-bottom: 1rem; }
+  .form-tag { font-size: 0.65rem; font-weight: 600; color: var(--mq-accent); background: rgba(16, 185, 129, 0.08); padding: 0.2rem 0.4rem; border-radius: 4px; display: inline-block; }
+  .form-title { font-size: 1.2rem; font-weight: 800; margin: 0.25rem 0 0 0; color: inherit; }
+  .form-subheading { font-size: 0.8rem; color: var(--mq-text-light); margin: 0.2rem 0 0 0; line-height: 1.35; }
+
+  .quote-form { display: flex; flex-direction: column; gap: 0.75rem; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .field-group { display: flex; flex-direction: column; gap: 0.2rem; }
+  .field-group label { font-size: 0.725rem; font-weight: 600; }
+  .field-input { border: 1px solid var(--mq-border); border-radius: 6px; padding: 0.5rem 0.7rem; font-size: 0.825rem; outline: none; background: transparent; color: inherit; }
+  .field-input:focus { border-color: var(--mq-accent); }
+  .field-textarea { resize: none; height: 60px; }
+
+  .quote-submit-btn {
+    background: var(--mq-accent); color: white; font-weight: 600; border: none;
+    padding: 0.7rem; border-radius: 6px; font-size: 0.85rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; margin-top: 0.25rem;
+  }
+  .btn-spinner { border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top: 2px solid white; width: 14px; height: 14px; animation: spin 0.8s linear infinite; }
+
+  .quote-success-screen { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 1rem 0; }
+  .success-checkmark-wrapper { background: rgba(16, 185, 129, 0.1); color: var(--mq-accent); width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 0.75rem; }
+  .success-icon { width: 28px; height: 28px; }
+  .quote-success-screen h4 { margin: 0 0 0.25rem 0; font-size: 1.1rem; color: inherit; }
+  .quote-success-screen p { font-size: 0.8rem; color: var(--mq-text-light); margin: 0 0 1.25rem 0; }
+  .quote-success-close-btn { background: rgba(var(--color-foreground), 0.9); color: white; border: none; font-weight: 600; padding: 0.5rem 1.25rem; border-radius: 6px; font-size: 0.75rem; }
+
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+</style>
+
+<script>
+  let hasShownExitIntent = false;
+
+  function openCartQuoteModal() {
+    const backdrop = document.getElementById('quoteModal');
+    if (backdrop) {
+      backdrop.classList.add('is-open');
+      loadQuoteCartData();
+    }
+  }
+
+  function closeCartQuoteModal() {
+    const backdrop = document.getElementById('quoteModal');
+    if (backdrop) {
+      backdrop.classList.remove('is-open');
+    }
+  }
+
+  function loadQuoteCartData() {
+    const listContainer = document.getElementById('quoteCartItemsList');
+    const subtotalEl = document.getElementById('quoteCartSubtotal');
+    const hiddenBodyField = document.getElementById('quoteHiddenCartDetails');
+    
+    if (!listContainer) return;
+
+    fetch('/cart.js')
+      .then(res => res.json())
+      .then(cart => {
+        if (!cart.items || cart.items.length === 0) {
+          listContainer.innerHTML = '<p class="summary-loading">Your cart is empty.</p>';
+          if (subtotalEl) subtotalEl.textContent = formatCartMoney(0);
+          return;
+        }
+
+        let itemsHtml = '';
+        let plaintextList = 'Cart Details for Invoice Quote:\n\n';
+
+        cart.items.forEach(item => {
+          const itemImg = item.image ? item.image : 'https://cdn.shopify.com/s/images/admin/no-image-large.gif';
+          const optionText = item.variant_options && item.variant_options.length > 0 && item.variant_options[0] !== 'Default Title' 
+            ? ` (${item.variant_options.join(', ')})` 
+            : '';
+
+          itemsHtml += `
+            <div class="quote-cart-item">
+              <img src="${itemImg}" alt="${item.title}" class="item-img">
+              <div class="item-info">
+                <p class="item-name">${item.product_title}</p>
+                <span class="item-meta">Qty: ${item.quantity} ${optionText}</span>
+              </div>
+              <span class="item-price">${formatCartMoney(item.line_price)}</span>
+            </div>
+          `;
+
+          plaintextList += `- ${item.quantity}x ${item.product_title} ${optionText} (Variant ID: ${item.variant_id}) - Unit Price: ${formatCartMoney(item.price)} (Total: ${formatCartMoney(item.line_price)})\n`;
+        });
+
+        plaintextList += `\nCart Total: ${formatCartMoney(cart.total_price)}`;
+        
+        listContainer.innerHTML = itemsHtml;
+        if (subtotalEl) subtotalEl.textContent = formatCartMoney(cart.total_price);
+        if (hiddenBodyField) hiddenBodyField.value = plaintextList;
+      })
+      .catch(err => {
+        console.error('Error loading cart preview', err);
+        listContainer.innerHTML = '<p class="summary-loading">Error loading cart items.</p>';
+      });
+  }
+
+  function formatCartMoney(cents) {
+    const amount = (cents / 100.0).toFixed(2);
+    const shopCurrencySymbol = '{{ cart.currency.symbol }}' || '$';
+    return `${shopCurrencySymbol}${amount}`;
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    const form = document.getElementById('quoteRequestForm');
+    const successScreen = document.getElementById('quoteSuccessScreen');
+    const webhookUrl = '{{ block.settings.webhook_url | escape }}';
+    
+    const isCartPage = window.location.pathname === '/cart' || window.location.pathname.endsWith('/cart');
+    const enableCartBtn = {{ block.settings.enable_cart_page_button | json }};
+
+    if (enableCartBtn && isCartPage) {
+      const checkoutBtnSelectors = [
+        'button[name="checkout"]',
+        '.cart__checkout-button',
+        '#checkout',
+        '[name="checkout"]'
+      ];
+      
+      let checkoutBtn = null;
+      for (let selector of checkoutBtnSelectors) {
+        checkoutBtn = document.querySelector(selector);
+        if (checkoutBtn) break;
+      }
+
+      if (checkoutBtn && !document.querySelector('.cart-quote-trigger-btn')) {
+        const triggerBtn = document.createElement('button');
+        triggerBtn.type = 'button';
+        triggerBtn.className = 'cart-quote-trigger-btn';
+        triggerBtn.innerHTML = `
+          <svg viewBox="0 0 20 20" fill="currentColor" class="btn-icon">
+            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
+          </svg>
+          ${"{{ block.settings.cart_button_text }}" ? "{{ block.settings.cart_button_text | escape }}" : "Request Wholesale Invoice"}
+        `;
+        triggerBtn.addEventListener('click', openCartQuoteModal);
+        
+        checkoutBtn.parentNode.insertBefore(triggerBtn, checkoutBtn.nextSibling);
+      }
+    }
+
+    {% if block.settings.enable_exit_intent %}
+      if (!sessionStorage.getItem('quote_modal_shown')) {
+        document.addEventListener('mouseout', function(e) {
+          if (e.clientY < 20) {
+            fetch('/cart.js')
+              .then(res => res.json())
+              .then(cart => {
+                if (cart.item_count > 0 && !hasShownExitIntent) {
+                  hasShownExitIntent = true;
+                  sessionStorage.setItem('quote_modal_shown', 'true');
+                  openCartQuoteModal();
+                }
+              });
+          }
+        });
+      }
+    {% endif %}
+
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const submitBtn = document.getElementById('quoteSubmitBtn');
+        const btnText = submitBtn.querySelector('.btn-text');
+        const btnSpinner = submitBtn.querySelector('.btn-spinner');
+        
+        if (btnText && btnSpinner) {
+          btnText.style.display = 'none';
+          btnSpinner.style.display = 'inline-block';
+        }
+        submitBtn.disabled = true;
+
+        const email = document.getElementById('quote-email').value;
+        const name = document.getElementById('quote-name').value;
+        const company = document.getElementById('quote-company').value;
+        const note = document.getElementById('quote-note').value;
+
+        if (webhookUrl && webhookUrl.trim() !== '') {
+          fetch('/cart.js')
+            .then(res => res.json())
+            .then(cart => {
+              const payload = {
+                email: email,
+                name: name,
+                company: company,
+                note: note,
+                cart_items: cart.items.map(item => ({
+                  variant_id: item.variant_id,
+                  quantity: item.quantity,
+                  product_title: item.product_title,
+                  variant_title: item.variant_title,
+                  price: item.price / 100.0,
+                  sku: item.sku
+                })),
+                cart_total: cart.total_price / 100.0,
+                shop_domain: Shopify.shop
+              };
+
+              return fetch(webhookUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              });
+            })
+            .then(() => {
+              form.style.display = 'none';
+              successScreen.style.display = 'flex';
+            })
+            .catch(error => {
+              console.error('Webhook failed, trying Shopify form fallback', error);
+              submitNativeForm(form);
+            });
+        } else {
+          submitNativeForm(form);
+        }
+      });
+    }
+
+    function submitNativeForm(formElement) {
+      const formData = new FormData(formElement);
+      fetch(formElement.action, {
+        method: 'POST',
+        body: formData,
+        headers: { 'Accept': 'text/html' }
+      })
+      .then(() => {
+        formElement.style.display = 'none';
+        successScreen.style.display = 'flex';
+      })
+      .catch(err => {
+        console.error('Shopify form AJAX failed, submitting normally', err);
+        formElement.submit();
+      });
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Cart Auto-Recovery",
+  "target": "body",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_exit_intent",
+      "label": "Enable Exit-Intent Trigger",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_cart_page_button",
+      "label": "Enable Cart Button Auto-Inject",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "cart_button_text",
+      "label": "Cart Button Label",
+      "default": "Request Wholesale Invoice"
+    },
+    {
+      "type": "text",
+      "id": "webhook_url",
+      "label": "Webhook URL (Optional)"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Modal Heading",
+      "default": "Save Your Cart as an Invoice Quote"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Modal Subheading",
+      "default": "Submit your wholesale cart details, and our sales team will email you a custom invoice draft."
+    }
+  ]
+}
+{% endschema %}

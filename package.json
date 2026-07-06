@@ -1,0 +1,17 @@
+{
+  "name": "wholesale-bulk-pricing-app",
+  "version": "1.0.0",
+  "description": "Shopify app containing Wholesale Bulk Pricing and Cart Abandonment Recovery blocks.",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"node server.js\" \"shopify app dev\"",
+    "deploy": "shopify app deploy",
+    "config:link": "shopify app config link",
+    "shopify": "shopify"
+  },
+  "dependencies": {
+    "@shopify/cli": "^3.62.0",
+    "concurrently": "^8.2.0",
+    "express": "^4.18.2"
+  }
+}

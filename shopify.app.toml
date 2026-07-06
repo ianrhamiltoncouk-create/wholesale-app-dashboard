@@ -1,0 +1,23 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+name = "Whole Sale orders "
+client_id = "c6fbf259f256c915a03d8cb1416ff624"
+application_url = "http://localhost:3000"
+embedded = true
+
+[build]
+include_config_on_deploy = true
+automatically_update_urls_on_dev = true
+
+[webhooks]
+api_version = "2026-10"
+
+[pos]
+embedded = false
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = ""
+
+[auth]
+redirect_urls = [ "http://localhost:3000/api/auth" ]
