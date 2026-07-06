@@ -1,8 +1,8 @@
 {% comment %}
-  Wholesale Bulk Pricing (App Embed version with Auto-Injection)
+  Wholesale Bulk Pricing (App Embed version with Auto-Injection & Dynamic Text Config)
   Automatically injects the wholesale pricing grid onto product pages above the product form.
   Zero code editing required from the merchant.
-  Schema optimized for App Embed limitations (max 6 settings).
+  Schema optimized for App Embed limitations (max 6 settings) using a parsed text config for unlimited tiers.
 {% endcomment %}
 
 {% if request.page_type == 'product' %}
@@ -36,7 +36,6 @@
     });
 
     function injectWholesalePricingWidget() {
-      // Find the target element (usually the add to cart form)
       const targetSelector = "form[action*='/cart/add']";
       const targetElement = document.querySelector(targetSelector);
       
@@ -80,48 +79,9 @@
               </p>
             </div>
 
-            <div class="wholesale-tiers-grid style-modern_grid">
-              <div class="wholesale-tier-card active" data-min-qty="1" data-discount-value="0" data-discount-type="percentage">
-                <div class="wholesale-tier-qty">1 - ${ ({{ block.settings.tier_1_qty | default: 5 }} - 1) } items</div>
-                <div class="wholesale-tier-price" data-base-price="{{ current_variant.price }}">${formattedBasePrice}</div>
-                <div class="wholesale-tier-discount">Regular Price</div>
-                <div class="wholesale-tier-status"><span class="status-dot"></span> Current</div>
-              </div>
-
-              ${ {{ block.settings.tier_1_qty | default: 0 }} > 0 ? `
-                <div class="wholesale-tier-card" 
-                     data-min-qty="{{ block.settings.tier_1_qty }}" 
-                     ${ {{ block.settings.tier_2_qty | default: 0 }} > 0 ? `data-max-qty="${ ({{ block.settings.tier_2_qty | default: 10 }} - 1) }"` : '' }
-                     data-discount-value="{{ block.settings.tier_1_value | default: 10 }}" 
-                     data-discount-type="percentage"
-                     data-discount-code="BULK5">
-                  <div class="wholesale-tier-qty">
-                    ${ {{ block.settings.tier_2_qty | default: 0 }} > 0 ? `{{ block.settings.tier_1_qty }} - ${ ({{ block.settings.tier_2_qty | default: 10 }} - 1) }` : '{{ block.settings.tier_1_qty }}+' } items
-                  </div>
-                  <div class="wholesale-tier-price" data-base-price="{{ current_variant.price }}">Calculating...</div>
-                  <div class="wholesale-tier-discount">
-                    {{ block.settings.tier_1_value | default: 10 }}% OFF
-                  </div>
-                  <div class="wholesale-tier-status"><span class="status-dot"></span> Select</div>
-                </div>
-              ` : '' }
-
-              ${ {{ block.settings.tier_2_qty | default: 0 }} > 0 ? `
-                <div class="wholesale-tier-card" 
-                     data-min-qty="{{ block.settings.tier_2_qty }}" 
-                     data-discount-value="{{ block.settings.tier_2_value | default: 20 }}" 
-                     data-discount-type="percentage"
-                     data-discount-code="BULK10">
-                  <div class="wholesale-tier-qty">
-                    {{ block.settings.tier_2_qty }}+ items
-                  </div>
-                  <div class="wholesale-tier-price" data-base-price="{{ current_variant.price }}">Calculating...</div>
-                  <div class="wholesale-tier-discount">
-                    {{ block.settings.tier_2_value | default: 20 }}% OFF
-                  </div>
-                  <div class="wholesale-tier-status"><span class="status-dot"></span> Select</div>
-                </div>
-              ` : '' }
+            <!-- Tiers Grid (Dynamically populated by JS parsing) -->
+            <div class="wholesale-tiers-grid style-modern_grid" id="wholesaleTiersGrid-{{ block.id }}">
+              <div class="summary-loading">Loading tiers...</div>
             </div>
 
             <div class="wholesale-progress-wrapper" style="display: none;">
@@ -230,103 +190,150 @@
         return productData.variants.find(v => v.id.toString() === variantId.toString()) || productData.variants[0];
       }
 
+      // 1. Parse text configuration string into pricing array
+      const configStr = "{{ block.settings.tier_config | default: '5:10, 10:15, 20:20' }}";
+      
+      function parseTiers(str) {
+        const parsed = [];
+        const items = str.split(',');
+        items.forEach(item => {
+          const parts = item.trim().split(':');
+          const qty = parseInt(parts[0], 10);
+          const value = parseFloat(parts[1]);
+          if (!isNaN(qty) && !isNaN(value) && qty > 1) {
+            parsed.push({
+              minQty: qty,
+              value: value,
+              code: `BULK${qty}` // Automatically maps to BULK5, BULK10, etc.
+            });
+          }
+        });
+        
+        // Sort tiers by minimum quantity ascending
+        parsed.sort((a, b) => a.minQty - b.minQty);
+        return parsed;
+      }
+
+      const customTiers = parseTiers(configStr);
       let currentlyAppliedCode = '';
+
+      // 2. Render Tiers Grid dynamically
+      function renderTiersGrid(variantPrice) {
+        const grid = container.querySelector(`#wholesaleTiersGrid-${blockId}`);
+        if (!grid) return;
+
+        if (customTiers.length === 0) {
+          grid.innerHTML = '<p class="summary-loading">Please configure tiers in app settings.</p>';
+          return;
+        }
+
+        // Generate base tier HTML (1 to Tier1_min - 1)
+        const baseMaxQty = customTiers[0].minQty - 1;
+        let gridHtml = `
+          <div class="wholesale-tier-card active" data-min-qty="1" data-max-qty="${baseMaxQty}" data-discount-value="0" data-discount-code="">
+            <div class="wholesale-tier-qty">1 ${baseMaxQty > 1 ? `- ${baseMaxQty}` : ''} item${baseMaxQty > 1 ? 's' : ''}</div>
+            <div class="wholesale-tier-price" data-price="${variantPrice}">${formatMoney(variantPrice)}</div>
+            <div class="wholesale-tier-discount">Regular Price</div>
+            <div class="wholesale-tier-status"><span class="status-dot"></span> Current</div>
+          </div>
+        `;
+
+        // Generate dynamically configured tiers
+        customTiers.forEach((tier, index) => {
+          const nextTier = customTiers[index + 1];
+          const maxQty = nextTier ? nextTier.minQty - 1 : null;
+          const discountedPrice = variantPrice * (1 - tier.value / 100.0);
+
+          gridHtml += `
+            <div class="wholesale-tier-card" 
+                 data-min-qty="${tier.minQty}" 
+                 ${maxQty ? `data-max-qty="${maxQty}"` : ''} 
+                 data-discount-value="${tier.value}" 
+                 data-discount-code="${tier.code}">
+              <div class="wholesale-tier-qty">
+                ${maxQty ? `${tier.minQty} - ${maxQty}` : `${tier.minQty}+`} items
+              </div>
+              <div class="wholesale-tier-price" data-price="${discountedPrice}">${formatMoney(discountedPrice)}</div>
+              <div class="wholesale-tier-discount">${tier.value}% OFF</div>
+              <div class="wholesale-tier-status"><span class="status-dot"></span> Select</div>
+            </div>
+          `;
+        });
+
+        grid.innerHTML = gridHtml;
+
+        // Re-attach card click listeners
+        const cards = grid.querySelectorAll('.wholesale-tier-card');
+        cards.forEach(card => {
+          card.addEventListener('click', function() {
+            if (!qtyInput) return;
+            qtyInput.value = parseInt(this.dataset.minQty, 10);
+            qtyInput.dispatchEvent(new Event('change', { bubbles: true }));
+            updateWidget();
+          });
+        });
+      }
 
       function updateWidget() {
         const activeVariantId = getSelectedVariantId();
         const variant = getSelectedVariant(activeVariantId);
         const currentPrice = variant.price;
 
-        const tierCards = container.querySelectorAll('.wholesale-tier-card');
-        let pricingTiers = [];
-
-        tierCards.forEach(card => {
-          const minQty = parseInt(card.dataset.minQty, 10);
-          const maxQty = card.dataset.maxQty ? parseInt(card.dataset.maxQty, 10) : Infinity;
-          const discValue = parseFloat(card.dataset.discountValue);
-          const discType = card.dataset.discountType;
-          const discountCode = card.dataset.discountCode || '';
-
-          let calculatedPrice = currentPrice;
-          if (discType === 'percentage') {
-            calculatedPrice = currentPrice * (1 - discValue / 100.0);
-          } else if (discType === 'fixed_amount') {
-            calculatedPrice = Math.max(0, currentPrice - (discValue * 100));
-          } else if (discType === 'fixed_price') {
-            calculatedPrice = discValue * 100;
-          }
-
-          const priceEl = card.querySelector('.wholesale-tier-price');
-          if (priceEl) {
-            priceEl.innerHTML = formatMoney(calculatedPrice);
-            priceEl.dataset.basePrice = currentPrice;
-          }
-
-          pricingTiers.push({
-            element: card,
-            minQty: minQty,
-            maxQty: maxQty,
-            unitPrice: calculatedPrice,
-            discountValue: discValue,
-            discountType: discType,
-            discountCode: discountCode
-          });
-        });
-
-        pricingTiers.sort((a, b) => a.minQty - b.minQty);
+        // Render grid with current variant price
+        renderTiersGrid(currentPrice);
 
         const currentQty = qtyInput ? parseInt(qtyInput.value, 10) || 1 : 1;
-        let activeTier = pricingTiers[0];
+        const cards = container.querySelectorAll('.wholesale-tier-card');
+        
+        let activeCard = cards[0];
 
-        pricingTiers.forEach(tier => {
-          if (currentQty >= tier.minQty && currentQty <= tier.maxQty) {
-            activeTier = tier;
+        cards.forEach(card => {
+          const min = parseInt(card.dataset.minQty, 10);
+          const max = card.dataset.maxQty ? parseInt(card.dataset.maxQty, 10) : Infinity;
+
+          if (currentQty >= min && currentQty <= max) {
+            activeCard = card;
           }
         });
 
-        pricingTiers.forEach(tier => {
-          if (tier === activeTier) {
-            tier.element.classList.add('active');
-            const statusText = tier.element.querySelector('.wholesale-tier-status');
+        // Toggle visual active state
+        cards.forEach(card => {
+          if (card === activeCard) {
+            card.classList.add('active');
+            const statusText = card.querySelector('.wholesale-tier-status');
             if (statusText) statusText.innerHTML = '<span class="status-dot"></span> Active';
           } else {
-            tier.element.classList.remove('active');
-            const statusText = tier.element.querySelector('.wholesale-tier-status');
+            card.classList.remove('active');
+            const statusText = card.querySelector('.wholesale-tier-status');
             if (statusText) statusText.innerHTML = '<span class="status-dot"></span> Select';
           }
         });
 
-        if (activeTier.discountCode && activeTier.discountCode !== currentlyAppliedCode) {
-          applyDiscountToSession(activeTier.discountCode);
-        } else if (!activeTier.discountCode && currentlyAppliedCode !== '') {
+        const activeDiscountCode = activeCard.dataset.discountCode || '';
+        if (activeDiscountCode && activeDiscountCode !== currentlyAppliedCode) {
+          applyDiscountToSession(activeDiscountCode);
+        } else if (!activeDiscountCode && currentlyAppliedCode !== '') {
           clearDiscountFromSession();
         }
 
-        updateProgressBar(currentQty, pricingTiers);
-        updateCalculator(currentQty, currentPrice, activeTier);
+        updateProgressBar(currentQty, currentPrice);
+        updateCalculator(currentQty, currentPrice, activeCard);
       }
 
-      function updateProgressBar(currentQty, pricingTiers) {
+      function updateProgressBar(currentQty, variantPrice) {
         const progressWrapper = container.querySelector('.wholesale-progress-wrapper');
         if (!progressWrapper) return;
 
-        const nextTier = pricingTiers.find(tier => currentQty < tier.minQty);
+        const nextTier = customTiers.find(tier => currentQty < tier.minQty);
         
         if (nextTier) {
           progressWrapper.style.display = 'block';
           const neededQty = nextTier.minQty - currentQty;
           const progressPercent = Math.min(100, (currentQty / nextTier.minQty) * 100);
 
-          let savingsDetail = '';
-          if (nextTier.discountType === 'percentage') {
-            savingsDetail = `${nextTier.discountValue}%`;
-          } else {
-            savingsDetail = formatMoney(nextTier.discountValue * 100);
-          }
-
           const hintEl = progressWrapper.querySelector('.wholesale-progress-hint');
           if (hintEl) {
-            hintEl.innerHTML = `Add <strong>${neededQty} more</strong> to unlock <strong>${savingsDetail} OFF</strong>`;
+            hintEl.innerHTML = `Add <strong>${neededQty} more</strong> to unlock <strong>${nextTier.value}% OFF</strong>`;
           }
 
           const barFill = progressWrapper.querySelector('.wholesale-progress-bar-fill');
@@ -346,7 +353,7 @@
         }
       }
 
-      function updateCalculator(qty, originalUnitPrice, activeTier) {
+      function updateCalculator(qty, originalUnitPrice, activeCard) {
         const displayQty = container.querySelector('#calc-qty-display');
         const unitPriceEl = container.querySelector('#calc-unit-price');
         const originalTotalEl = container.querySelector('#calc-original-total');
@@ -354,11 +361,13 @@
         const savingsContainer = container.querySelector('#calc-savings-container');
         const savingsAmountEl = container.querySelector('#calc-savings-amount');
 
+        const activePrice = parseFloat(activeCard.querySelector('.wholesale-tier-price').dataset.price);
+
         if (displayQty) displayQty.textContent = `${qty} item${qty > 1 ? 's' : ''}`;
-        if (unitPriceEl) unitPriceEl.textContent = formatMoney(activeTier.unitPrice);
+        if (unitPriceEl) unitPriceEl.textContent = formatMoney(activePrice);
 
         const totalOriginal = originalUnitPrice * qty;
-        const totalDiscounted = activeTier.unitPrice * qty;
+        const totalDiscounted = activePrice * qty;
         const savings = totalOriginal - totalDiscounted;
 
         if (finalTotalEl) finalTotalEl.textContent = formatMoney(totalDiscounted);
@@ -419,16 +428,6 @@
         }
       });
       urlObserver.observe(document.head, { subtree: true, childList: true });
-
-      const tierCards = container.querySelectorAll('.wholesale-tier-card');
-      tierCards.forEach(card => {
-        card.addEventListener('click', function() {
-          if (!qtyInput) return;
-          qtyInput.value = parseInt(this.dataset.minQty, 10);
-          qtyInput.dispatchEvent(new Event('change', { bubbles: true }));
-          updateWidget();
-        });
-      });
 
       updateWidget();
     }
@@ -637,28 +636,11 @@
       "default": "wholesale"
     },
     {
-      "type": "number",
-      "id": "tier_1_qty",
-      "label": "Tier 1 Min Quantity",
-      "default": 5
-    },
-    {
-      "type": "number",
-      "id": "tier_1_value",
-      "label": "Tier 1 Discount %",
-      "default": 10
-    },
-    {
-      "type": "number",
-      "id": "tier_2_qty",
-      "label": "Tier 2 Min Quantity",
-      "default": 10
-    },
-    {
-      "type": "number",
-      "id": "tier_2_value",
-      "label": "Tier 2 Discount %",
-      "default": 20
+      "type": "text",
+      "id": "tier_config",
+      "label": "Wholesale Tiers (Qty:Discount%)",
+      "default": "5:10, 10:15, 20:20",
+      "info": "Format: MinQty:DiscountPercentage separated by commas. E.g. '5:10, 10:15, 20:20' means: 5+ items gets 10% off, 10+ items gets 15% off, 20+ items gets 20% off. You can add as many tiers as you want!"
     }
   ]
 }
