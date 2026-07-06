@@ -2,7 +2,7 @@
 
 name = "Whole Sale orders "
 client_id = "c6fbf259f256c915a03d8cb1416ff624"
-application_url = "http://localhost:3000"
+application_url = "https://ianrhamiltoncouk-create.github.io/wholesale-app-dashboard"
 embedded = true
 
 [build]
@@ -20,4 +20,4 @@ embedded = false
 scopes = ""
 
 [auth]
-redirect_urls = [ "http://localhost:3000/api/auth" ]
+redirect_urls = [ "https://ianrhamiltoncouk-create.github.io/wholesale-app-dashboard/api/auth" ]
