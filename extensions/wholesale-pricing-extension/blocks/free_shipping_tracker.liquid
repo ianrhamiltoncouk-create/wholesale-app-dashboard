@@ -1,9 +1,8 @@
 {% comment %}
   Free Shipping Progress Tracker (App Embed version with Auto-Injection)
-  Tells customers how much more they need to spend to unlock free shipping.
-  Zero code editing required from the merchant.
-  Schema optimized for App Embed limitations (max 6 settings).
 {% endcomment %}
+
+{{ 'storefront-suite.css' | asset_url | stylesheet_tag }}
 
 <div class="free-shipping-tracker-container" id="fs-tracker-{{ block.id }}" style="display: none;">
   <div class="fs-tracker-content">
@@ -15,72 +14,6 @@
     </div>
   </div>
 </div>
-
-<style>
-  .free-shipping-tracker-container {
-    width: 100%;
-    background: var(--gradient-background, #ffffff);
-    border-bottom: 1px solid rgba(var(--color-foreground), 0.08);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    padding: 0.75rem 1.25rem;
-    box-sizing: border-box;
-    font-family: inherit;
-    z-index: 99999;
-    transition: all 0.3s ease;
-  }
-  
-  /* Positions */
-  .fs-pos-top_banner {
-    position: sticky;
-    top: 0;
-  }
-  .fs-pos-bottom_floating {
-    position: fixed;
-    bottom: 1.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90%;
-    max-width: 500px;
-    border: 1px solid rgba(var(--color-foreground), 0.1);
-    border-radius: 10px;
-    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
-  }
-
-  .fs-tracker-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    max-width: 800px;
-    margin: 0 auto;
-  }
-
-  .fs-tracker-message {
-    font-size: 0.85rem;
-    font-weight: 600;
-    margin: 0;
-    text-align: center;
-    color: rgba(var(--color-foreground), 0.75);
-  }
-  .fs-tracker-message strong {
-    color: #10b981;
-  }
-
-  .fs-progress-bar-bg {
-    width: 100%;
-    height: 6px;
-    background: rgba(var(--color-foreground), 0.06);
-    border-radius: 99px;
-    overflow: hidden;
-  }
-
-  .fs-progress-bar-fill {
-    height: 100%;
-    background: #10b981;
-    border-radius: 99px;
-    transition: width 0.4s ease-out;
-  }
-</style>
 
 <script>
   (function() {
@@ -95,13 +28,11 @@
       
       if (!container || !messageEl || !fillEl) return;
 
-      const threshold = parseFloat('{{ block.settings.shipping_threshold | default: 75 }}') * 100; // Convert to cents
+      const threshold = parseFloat('{{ block.settings.shipping_threshold | default: 75 }}') * 100;
       const position = '{{ block.settings.position | default: "top_banner" }}';
       
-      // Set positioning class
       container.className = `free-shipping-tracker-container fs-pos-${position}`;
 
-      // Set progress fill color
       const barColor = '{{ block.settings.bar_color | default: "#10b981" }}';
       fillEl.style.backgroundColor = barColor;
 
@@ -141,10 +72,8 @@
         return `${shopCurrencySymbol}${amount}`;
       }
 
-      // Check initially on page load
       updateTracker();
 
-      // Intercept AJAX additions to sync progress bar dynamically
       const nativeFetch = window.fetch;
       window.fetch = function() {
         return nativeFetch.apply(this, arguments).then(response => {

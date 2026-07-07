@@ -1,8 +1,8 @@
 {% comment %}
   Stock Scarcity & Viewers Counter Alert (App Block version)
-  Creates urgency using real stock levels and randomized social proof view counts.
-  Can be placed anywhere on the product page layout.
 {% endcomment %}
+
+{{ 'storefront-suite.css' | asset_url | stylesheet_tag }}
 
 <div class="scarcity-alerts-container-block" id="scarcity-{{ block.id }}">
   {% if block.settings.show_stock_scarcity %}
@@ -29,69 +29,6 @@
   {% endif %}
 </div>
 
-<style>
-  .scarcity-alerts-container-block {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    margin: 1rem 0;
-    width: 100%;
-    font-family: inherit;
-    box-sizing: border-box;
-  }
-
-  .scarcity-row {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.55rem 0.85rem;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    box-sizing: border-box;
-    width: 100%;
-    animation: wsFadeIn 0.3s ease;
-  }
-
-  .scarcity-stock {
-    background: rgba(239, 68, 68, 0.05);
-    border: 1px solid rgba(239, 68, 68, 0.12);
-    color: #b91c1c;
-  }
-  
-  .scarcity-viewers {
-    background: rgba(59, 130, 246, 0.05);
-    border: 1px solid rgba(59, 130, 246, 0.12);
-    color: #1d4ed8;
-  }
-
-  .pulse-fire-icon, .pulse-eye-icon {
-    font-size: 1.1rem;
-    display: inline-block;
-  }
-  .scarcity-stock .pulse-fire-icon {
-    animation: firePulse 1.5s infinite alternate;
-  }
-  .scarcity-viewers .pulse-eye-icon {
-    animation: eyeWink 3.5s infinite;
-  }
-
-  @keyframes firePulse {
-    0% { transform: scale(1); filter: drop-shadow(0 0 1px rgba(239,68,68,0.2)); }
-    100% { transform: scale(1.15); filter: drop-shadow(0 0 4px rgba(239,68,68,0.4)); }
-  }
-
-  @keyframes eyeWink {
-    0%, 90%, 100% { transform: scaleY(1); }
-    95% { transform: scaleY(0.1); }
-  }
-
-  @keyframes wsFadeIn {
-    from { opacity: 0; transform: translateY(3px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-</style>
-
 <script>
   (function() {
     document.addEventListener('DOMContentLoaded', function() {
@@ -102,7 +39,6 @@
       const container = document.getElementById('scarcity-{{ block.id }}');
       if (!container) return;
 
-      // 1. Social proof viewer logic
       const viewersTextEl = document.getElementById('viewers-text-{{ block.id }}');
       if (viewersTextEl) {
         const min = parseInt('{{ block.settings.min_visitors | default: 5 }}', 10);
@@ -115,11 +51,9 @@
         }
 
         updateVisitorCount();
-        // Shift count slightly every 8-15 seconds for realism
         setInterval(updateVisitorCount, Math.floor(Math.random() * 7000) + 8000);
       }
 
-      // 2. Synchronize variant selection with inventory checks
       const variantInputSelectors = [
         'select[name="id"]',
         'input[name="id"]',
@@ -128,7 +62,6 @@
         'variant-radios input[type="radio"]:checked'
       ];
 
-      // Fetch the product JSON data to map variants to their inventory levels
       const productJson = {{ product | json }};
       
       function updateVariantInventory() {
@@ -153,9 +86,6 @@
 
         if (variant && stockRow && stockText) {
           const threshold = parseInt(stockRow.dataset.threshold, 10);
-          
-          // Note: In public client-side JSON, inventory_quantity is sometimes hidden by Shopify settings.
-          // Fallback: If inventory is tracked but quantity isn't in JSON, we hide it or show fallback
           const qty = variant.inventory_quantity;
           
           if (qty !== undefined && qty > 0 && qty <= threshold) {
@@ -236,11 +166,6 @@
       "id": "viewers_text",
       "label": "Viewer Warning Text",
       "default": "[count] people are viewing this product right now."
-    }
-  ],
-  "presets": [
-    {
-      "name": "Urgency & Scarcity Alerts"
     }
   ]
 }

@@ -1,93 +1,15 @@
 {% comment %}
   Related Products Upsell Slider (App Block version)
-  Leverages Shopify's built-in recommendation algorithm.
-  Can be placed anywhere on the product details page.
 {% endcomment %}
+
+{{ 'storefront-suite.css' | asset_url | stylesheet_tag }}
 
 <div class="related-products-slider-block" id="rp-{{ block.id }}" style="display: none;">
   <h3 class="rp-slider-title">{{ block.settings.heading | default: "You May Also Like" | escape }}</h3>
   
-  <!-- Carousel Grid -->
   <div class="rp-products-grid" id="rp-grid-{{ block.id }}">
-    <!-- Populated dynamically via Shopify's Recommendations API -->
   </div>
 </div>
-
-<style>
-  .related-products-slider-block {
-    width: 100%;
-    margin: 2rem 0;
-    font-family: inherit;
-    box-sizing: border-box;
-  }
-
-  .rp-slider-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: rgba(var(--color-foreground), 0.9);
-    margin: 0 0 1.25rem 0;
-    text-align: center;
-  }
-
-  .rp-products-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 1.25rem;
-    width: 100%;
-  }
-
-  /* Related Product Card styling */
-  .rp-card {
-    background: transparent;
-    border: 1px solid rgba(var(--color-foreground), 0.06);
-    border-radius: 8px;
-    padding: 0.6rem;
-    display: flex;
-    flex-direction: column;
-    text-decoration: none;
-    color: inherit;
-    transition: all 0.3s ease;
-    box-sizing: border-box;
-  }
-  .rp-card:hover {
-    border-color: #10b981;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-  }
-
-  .rp-card-image-wrapper {
-    width: 100%;
-    aspect-ratio: 1;
-    border-radius: 6px;
-    overflow: hidden;
-    margin-bottom: 0.5rem;
-    border: 1px solid rgba(var(--color-foreground), 0.04);
-    background: #f9fafb;
-  }
-  .rp-card-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .rp-card-title {
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: rgba(var(--color-foreground), 0.8);
-    line-height: 1.3;
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .rp-card-price {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #10b981;
-    margin-top: 0.25rem;
-  }
-</style>
 
 <script>
   (function() {
@@ -104,7 +26,6 @@
       const productId = '{{ product.id }}';
       const limit = parseInt('{{ block.settings.limit | default: 4 }}', 10);
       
-      // Fetch from Shopify's native recommendation endpoint
       fetch(`/recommendations/products.json?product_id=${productId}&limit=${limit}`)
         .then(response => response.json())
         .then(data => {
@@ -158,11 +79,6 @@
       "id": "limit",
       "label": "Max Recommendations to Show",
       "default": 4
-    }
-  ],
-  "presets": [
-    {
-      "name": "Related Products Slider"
     }
   ]
 }

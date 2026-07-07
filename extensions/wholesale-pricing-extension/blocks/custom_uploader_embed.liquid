@@ -1,12 +1,10 @@
 {% comment %}
   Custom File Uploader & Personalization Widget (App Embed Version with Auto-Injection)
-  Allows customers to upload custom designs (t-shirts, artwork) directly on the product page.
-  Uploaded files are hosted by Shopify and linked in the order details page.
-  Zero code editing required from the merchant.
-  Schema optimized for App Embed limitations (max 6 settings).
 {% endcomment %}
 
 {% if request.page_type == 'product' %}
+  {{ 'storefront-suite.css' | asset_url | stylesheet_tag }}
+
   <!-- Embed configuration check -->
   <script>
   (function() {
@@ -15,7 +13,6 @@
     });
 
     function injectCustomUploaderWidget() {
-      // Find the add to cart form
       const targetSelector = "form[action*='/cart/add']";
       const targetElement = document.querySelector(targetSelector);
       
@@ -37,7 +34,6 @@
     function insertUploader(target) {
       if (document.getElementById('custom-uploader-{{ block.id }}')) return;
 
-      // Ensure the product form supports file uploads (enctype="multipart/form-data")
       const form = target.tagName === 'FORM' ? target : target.querySelector('form');
       if (form) {
         form.setAttribute('enctype', 'multipart/form-data');
@@ -47,7 +43,6 @@
       container.id = 'custom-uploader-{{ block.id }}';
       container.className = 'custom-uploader-container-embed';
 
-      // Insert widget above the Add to Cart form
       target.parentNode.insertBefore(container, target);
 
       container.innerHTML = `
@@ -57,7 +52,6 @@
             <span class="uploader-subtitle">Allowed formats: {{ block.settings.allowed_extensions | default: "png, jpg, jpeg, pdf" | escape }}</span>
           </div>
 
-          <!-- Drag and drop zone -->
           <div class="upload-dropzone" id="dropzone-{{ block.id }}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="upload-icon">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -66,7 +60,6 @@
             </svg>
             <span class="dropzone-text" id="dropzone-text-{{ block.id }}">Drag & drop or <strong class="select-link">browse</strong></span>
             
-            <!-- Hidden file input using Shopify's properties mapping -->
             <input type="file" 
                    id="file-input-{{ block.id }}" 
                    name="properties[{{ block.settings.file_label | default: 'Custom Design File' | escape }}]" 
@@ -75,7 +68,6 @@
                    {% if block.settings.is_required %}required{% endif %}>
           </div>
 
-          <!-- File Preview Container -->
           <div class="upload-preview-wrapper" id="preview-wrapper-{{ block.id }}" style="display: none;">
             <div class="preview-thumbnail-container">
               <img id="preview-img-{{ block.id }}" class="preview-thumbnail" src="" alt="Thumbnail preview">
@@ -101,7 +93,6 @@
             </button>
           </div>
 
-          <!-- Custom Instructions Option -->
           ${ {{ block.settings.allow_text | default: false }} ? `
             <div class="uploader-instructions-wrapper">
               <label for="instructions-{{ block.id }}" class="instructions-label">
@@ -135,10 +126,8 @@
 
       if (!dropzone || !fileInput) return;
 
-      // Click to open file dialog
       dropzone.addEventListener('click', () => fileInput.click());
 
-      // Drag and drop event listeners
       ['dragenter', 'dragover'].forEach(eventName => {
         dropzone.addEventListener(eventName, (e) => {
           e.preventDefault();
@@ -176,18 +165,16 @@
       });
 
       function handleFileSelection(file) {
-        const maxSize = 20 * 1024 * 1024; // 20 MB cap
+        const maxSize = 20 * 1024 * 1024;
         if (file.size > maxSize) {
           alert('File size exceeds the 20MB limit.');
           fileInput.value = '';
           return;
         }
 
-        // Display files info
         filenameEl.textContent = file.name;
         filesizeEl.textContent = formatBytes(file.size);
 
-        // Render preview
         if (file.type.startsWith('image/')) {
           const reader = new FileReader();
           reader.onload = function(e) {
@@ -201,7 +188,6 @@
           previewIcon.style.display = 'flex';
         }
 
-        // Hide dropzone, show preview
         dropzone.style.display = 'none';
         previewWrapper.style.display = 'flex';
       }
@@ -217,91 +203,6 @@
     }
   })();
   </script>
-
-  <style>
-    .custom-uploader-container-embed {
-      background: var(--gradient-background, #ffffff);
-      color: rgba(var(--color-foreground), 0.75);
-      border: 1px solid rgba(var(--color-foreground), 0.08);
-      border-radius: 12px;
-      padding: 1.5rem;
-      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
-      margin: 1.5rem 0;
-      width: 100%;
-      box-sizing: border-box;
-      font-family: inherit;
-    }
-    
-    .uploader-header { margin-bottom: 1rem; }
-    .uploader-title { font-size: 1rem; font-weight: 700; margin: 0; color: inherit; }
-    .uploader-subtitle { font-size: 0.75rem; color: rgba(var(--color-foreground), 0.5); }
-
-    .upload-dropzone {
-      border: 2px dashed rgba(var(--color-foreground), 0.15);
-      border-radius: 8px;
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      background: rgba(var(--color-foreground), 0.01);
-      transition: all 0.3s ease;
-    }
-    .upload-dropzone:hover, .upload-dropzone.dragover {
-      border-color: #10b981;
-      background: rgba(16, 185, 129, 0.02);
-    }
-    .upload-icon { width: 32px; height: 32px; color: rgba(var(--color-foreground), 0.35); margin-bottom: 0.5rem; }
-    .dropzone-text { font-size: 0.8rem; color: rgba(var(--color-foreground), 0.6); }
-    .select-link { color: #10b981; text-decoration: underline; }
-    .hidden-file-input { display: none; }
-
-    /* Preview style */
-    .upload-preview-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      border: 1px solid rgba(var(--color-foreground), 0.12);
-      border-radius: 8px;
-      padding: 0.75rem 1rem;
-      background: rgba(var(--color-foreground), 0.01);
-    }
-    .preview-thumbnail-container {
-      width: 50px; height: 50px;
-      border-radius: 6px; overflow: hidden;
-      border: 1px solid rgba(var(--color-foreground), 0.08);
-      display: flex; align-items: center; justify-content: center;
-      background: #f9fafb;
-    }
-    .preview-thumbnail { width: 100%; height: 100%; object-fit: cover; }
-    .preview-file-icon { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: rgba(var(--color-foreground), 0.4); }
-    .doc-icon { width: 22px; height: 22px; }
-    
-    .preview-details { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
-    .preview-filename { font-size: 0.8rem; font-weight: 600; color: inherit; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
-    .preview-filesize { font-size: 0.7rem; color: rgba(var(--color-foreground), 0.5); }
-
-    .preview-remove-btn { background: transparent; border: none; color: #ef4444; cursor: pointer; padding: 0.25rem; border-radius: 50%; display: flex; align-items: center; }
-    .preview-remove-btn:hover { background: rgba(239, 68, 68, 0.05); }
-    .trash-icon { width: 18px; height: 18px; }
-
-    /* Custom Text instructions */
-    .uploader-instructions-wrapper { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.35rem; }
-    .instructions-label { font-size: 0.8rem; font-weight: 600; }
-    .instructions-textarea {
-      border: 1px solid rgba(var(--color-foreground), 0.12);
-      border-radius: 6px;
-      padding: 0.5rem 0.75rem;
-      font-size: 0.8rem;
-      outline: none;
-      background: transparent;
-      color: inherit;
-      resize: none;
-      height: 60px;
-    }
-    .instructions-textarea:focus { border-color: #10b981; }
-  </style>
 {% endif %}
 
 {% schema %}

@@ -1,54 +1,14 @@
 {% comment %}
   Back to Top Button (App Embed version with Auto-Injection)
-  Adds a floating smooth scroll button in the bottom corner of long pages.
-  Zero code editing required from the merchant.
-  Schema optimized for App Embed limitations (max 6 settings).
 {% endcomment %}
 
+{{ 'storefront-suite.css' | asset_url | stylesheet_tag }}
+
 <button type="button" class="back-to-top-floating-btn" id="btt-btn-{{ block.id }}" style="display: none;" onclick="scrollToTopSmooth()">
-  <!-- Arrow Up SVG -->
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="btt-icon">
     <polyline points="18 15 12 9 6 15"></polyline>
   </svg>
 </button>
-
-<style>
-  .back-to-top-floating-btn {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    width: 44px;
-    height: 44px;
-    background-color: {{ block.settings.bg_color | default: '#10b981' }};
-    color: {{ block.settings.icon_color | default: '#ffffff' }};
-    border: 1px solid rgba(0,0,0,0.06);
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.12);
-    z-index: 99999;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.25s ease;
-  }
-  
-  .back-to-top-floating-btn.is-visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .back-to-top-floating-btn:hover {
-    background-color: #000000;
-    transform: translateY(-2px);
-  }
-
-  .btt-icon {
-    width: 18px;
-    height: 18px;
-  }
-</style>
 
 <script>
   function scrollToTopSmooth() {
@@ -70,6 +30,10 @@
       const threshold = parseInt('{{ block.settings.scroll_threshold | default: 300 }}', 10);
 
       btn.style.display = 'flex';
+      
+      // Set background color inline since it is a customizable color setting
+      btn.style.backgroundColor = '{{ block.settings.bg_color | default: "#10b981" }}';
+      btn.style.color = '{{ block.settings.icon_color | default: "#ffffff" }}';
 
       window.addEventListener('scroll', function() {
         if (window.scrollY >= threshold) {

@@ -1,8 +1,8 @@
 {% comment %}
   Collapsible FAQ Accordion (App Block version)
-  Creates collapsible detail tabs for common pre-sales questions.
-  Can be placed anywhere on the product details template.
 {% endcomment %}
+
+{{ 'storefront-suite.css' | asset_url | stylesheet_tag }}
 
 <div class="faq-accordion-container-block" id="faq-{{ block.id }}">
   {% if block.settings.title != blank %}
@@ -61,86 +61,12 @@
   {% endif %}
 </div>
 
-<style>
-  .faq-accordion-container-block {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    margin: 1.5rem 0;
-    box-sizing: border-box;
-    font-family: inherit;
-  }
-
-  .faq-accordion-title {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: rgba(var(--color-foreground), 0.9);
-    margin: 0 0 0.75rem 0;
-  }
-
-  .faq-row {
-    border-bottom: 1px solid rgba(var(--color-foreground), 0.08);
-    width: 100%;
-    box-sizing: border-box;
-  }
-  .faq-row:first-of-type {
-    border-top: 1px solid rgba(var(--color-foreground), 0.08);
-  }
-
-  .faq-header-btn {
-    width: 100%;
-    background: transparent;
-    border: none;
-    padding: 0.85rem 0.25rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: rgba(var(--color-foreground), 0.8);
-    transition: color 0.2s ease;
-  }
-  .faq-header-btn:hover {
-    color: #10b981;
-  }
-
-  .faq-chevron {
-    width: 16px;
-    height: 16px;
-    color: rgba(var(--color-foreground), 0.4);
-    transition: transform 0.3s ease;
-  }
-
-  /* Expand Collapse transition */
-  .faq-content-pane {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .faq-content-inner {
-    padding: 0 0.25rem 0.85rem 0.25rem;
-    font-size: 0.8rem;
-    color: rgba(var(--color-foreground), 0.6);
-    line-height: 1.5;
-  }
-  .faq-content-inner p {
-    margin: 0;
-  }
-
-  /* Open classes */
-  .faq-row.is-open .faq-chevron {
-    transform: rotate(180deg);
-  }
-</style>
-
 <script>
   function toggleFaqRow(button) {
     const row = button.parentNode;
     const pane = row.querySelector('.faq-content-pane');
     const isOpen = row.classList.contains('is-open');
 
-    // Close all other rows for accordion style
     const container = row.parentNode;
     const allRows = container.querySelectorAll('.faq-row');
     allRows.forEach(r => {
@@ -155,7 +81,6 @@
       pane.style.maxHeight = null;
     } else {
       row.classList.add('is-open');
-      // Set height dynamically based on content scrollHeight
       pane.style.maxHeight = pane.scrollHeight + "px";
     }
   }
@@ -219,11 +144,6 @@
       "id": "content_3",
       "label": "Panel 3 Content",
       "default": "Wash in cold water with like colors. Tumble dry on low heat."
-    }
-  ],
-  "presets": [
-    {
-      "name": "FAQ Collapsible Accordion"
     }
   ]
 }

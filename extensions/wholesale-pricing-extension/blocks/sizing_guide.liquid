@@ -1,8 +1,8 @@
 {% comment %}
   Sizing Guide Link & Popup Chart (App Block version)
-  Adds a size chart link next to size variant options and opens a measurement guide modal.
-  Can be placed anywhere on the product details page.
 {% endcomment %}
+
+{{ 'storefront-suite.css' | asset_url | stylesheet_tag }}
 
 <div class="sizing-guide-wrapper-block" id="sg-{{ block.id }}">
   <button type="button" class="sizing-guide-trigger-link" onclick="openSizingGuideModal('{{ block.id }}')">
@@ -15,7 +15,6 @@
     <span>{{ block.settings.link_text | default: "Size Guide" | escape }}</span>
   </button>
 
-  <!-- Modal Backdrop & Box -->
   <div class="sizing-modal-backdrop" id="sg-modal-{{ block.id }}">
     <div class="sizing-modal-card">
       <button type="button" class="sizing-modal-close" onclick="closeSizingGuideModal('{{ block.id }}')">
@@ -32,11 +31,9 @@
           <table class="sizing-chart-table">
             <thead>
               <tr id="sg-headers-{{ block.id }}">
-                <!-- Populated dynamically by JS -->
               </tr>
             </thead>
             <tbody id="sg-rows-{{ block.id }}">
-              <!-- Populated dynamically by JS -->
             </tbody>
           </table>
         </div>
@@ -48,96 +45,6 @@
     </div>
   </div>
 </div>
-
-<style>
-  .sizing-guide-wrapper-block {
-    display: inline-block;
-    margin: 0.5rem 0;
-    font-family: inherit;
-  }
-
-  .sizing-guide-trigger-link {
-    background: transparent;
-    border: none;
-    padding: 0.25rem 0;
-    color: rgba(var(--color-foreground), 0.7);
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    transition: color 0.25s ease;
-  }
-  .sizing-guide-trigger-link:hover {
-    color: #10b981;
-  }
-  .ruler-icon { width: 14px; height: 14px; }
-
-  /* Sizing Guide Modal */
-  .sizing-modal-backdrop {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(4px);
-    z-index: 999999;
-    display: flex; align-items: center; justify-content: center;
-    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-  }
-  .sizing-modal-backdrop.is-open { opacity: 1; pointer-events: auto; }
-
-  .sizing-modal-card {
-    background: var(--gradient-background, #ffffff);
-    color: rgba(var(--color-foreground), 0.75);
-    width: 90%; max-width: 550px;
-    border-radius: 12px;
-    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
-    position: relative; overflow: hidden;
-    transform: scale(0.95); transition: transform 0.3s ease;
-    border: 1px solid rgba(var(--color-foreground), 0.08);
-  }
-  .sizing-modal-backdrop.is-open .sizing-modal-card { transform: scale(1); }
-
-  .sizing-modal-close {
-    position: absolute; top: 1rem; right: 1rem;
-    background: transparent; border: none;
-    color: rgba(var(--color-foreground), 0.4); cursor: pointer;
-    z-index: 10; padding: 0.25rem; border-radius: 50%;
-  }
-  .sizing-modal-close:hover { color: rgba(var(--color-foreground), 0.9); background: rgba(0,0,0,0.05); }
-  .sizing-modal-close .close-icon { width: 16px; height: 16px; }
-
-  .sizing-modal-body { padding: 2rem; }
-  .sizing-modal-title { font-size: 1.15rem; font-weight: 800; color: inherit; margin: 0 0 1.25rem 0; text-align: center; }
-
-  .sizing-table-wrapper {
-    overflow-x: auto;
-    border: 1px solid rgba(var(--color-foreground), 0.08);
-    border-radius: 8px;
-    margin-bottom: 1rem;
-  }
-  .sizing-chart-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.8rem;
-    text-align: left;
-  }
-  .sizing-chart-table th, .sizing-chart-table td {
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid rgba(var(--color-foreground), 0.06);
-  }
-  .sizing-chart-table th {
-    background: rgba(var(--color-foreground), 0.02);
-    font-weight: 700;
-  }
-  .sizing-chart-table tr:last-child td {
-    border-bottom: none;
-  }
-
-  .sizing-modal-footer-note { font-size: 0.725rem; color: rgba(var(--color-foreground), 0.5); text-align: center; margin: 0.5rem 0 0 0; }
-</style>
 
 <script>
   function openSizingGuideModal(blockId) {
@@ -161,12 +68,10 @@
       
       if (!headersContainer || !rowsContainer) return;
 
-      // 1. Populate Headers
       const headersStr = '{{ block.settings.chart_table_headers | default: "Size, Chest (in), Waist (in)" }}';
       const headers = headersStr.split(',');
       headersContainer.innerHTML = headers.map(h => `<th>${h.trim()}</th>`).join('');
 
-      // 2. Populate Rows
       const rowsStr = `{{ block.settings.chart_table_rows | replace: "\r", "" }}`;
       const lines = rowsStr.split('\n');
       
@@ -210,18 +115,13 @@
       "id": "chart_table_rows",
       "label": "Table Rows (colon-separated cells, new line per row)",
       "default": "S: 34-36: 28-30: 34-36\nM: 38-40: 32-34: 38-40\nL: 42-44: 36-38: 42-44\nXL: 46-48: 40-42: 46-48",
-      "info": "Format cell values separated by colons (:), one row per line. Example: S: 34-36: 28-30"
+      "info": "Format cell values separated by colons (:), one row per line."
     },
     {
       "type": "textarea",
       "id": "text_below_table",
       "label": "Footer Note Below Table",
       "default": "Measurements refer to body size, not garment dimensions."
-    }
-  ],
-  "presets": [
-    {
-      "name": "Sizing Guide Link"
     }
   ]
 }
