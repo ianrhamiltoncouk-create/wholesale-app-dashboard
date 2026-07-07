@@ -311,9 +311,8 @@
 
     <!-- Category Tabs -->
     <div class="category-tabs">
-      <button class="tab-button active" id="tab-b2b" onclick="switchCategory('b2b')">🏷️ B2B & Wholesale Tiers</button>
-      <button class="tab-button" id="tab-cart" onclick="switchCategory('cart')">🛒 Cart & Checkout Boosters</button>
-      <button class="tab-button" id="tab-conversion" onclick="switchCategory('conversion')">🎨 Conversion & Urgency Tools</button>
+      <button class="tab-button active" id="tab-core" onclick="switchCategory('core')">🚀 Core Suite (High Value)</button>
+      <button class="tab-button" id="tab-bonus" onclick="switchCategory('bonus')">⚙️ Optional Utilities</button>
     </div>
 
     <!-- Widget Selector Title -->
@@ -358,7 +357,7 @@
     const ordersUrl = shop ? `https://admin.shopify.com/store/${shopId}/orders` : 'https://admin.shopify.com/store/orders';
 
     // App state
-    let activeCategory = 'b2b';
+    let activeCategory = 'core';
     let activeWidget = 'wholesale';
     let activeStep = 1;
 
@@ -704,9 +703,8 @@
 
     // Category mappings
     const categoryWidgets = {
-      b2b: ['wholesale'],
-      cart: ['cart_recovery', 'shipping_tracker', 'sticky_cart', 'back_to_top'],
-      conversion: ['file_uploader', 'scarcity_alerts', 'flash_timer', 'sizing_guide', 'collapsible_faq', 'related_products', 'quick_view']
+      core: ['wholesale', 'file_uploader', 'cart_recovery'],
+      bonus: ['shipping_tracker', 'sticky_cart', 'scarcity_alerts', 'flash_timer', 'sizing_guide', 'collapsible_faq', 'related_products', 'quick_view', 'back_to_top']
     };
 
     function switchCategory(catName) {
@@ -714,9 +712,8 @@
       activeWidget = categoryWidgets[catName][0];
       activeStep = 1;
 
-      document.getElementById('tab-b2b').classList.toggle('active', catName === 'b2b');
-      document.getElementById('tab-cart').classList.toggle('active', catName === 'cart');
-      document.getElementById('tab-conversion').classList.toggle('active', catName === 'conversion');
+      document.getElementById('tab-core').classList.toggle('active', catName === 'core');
+      document.getElementById('tab-bonus').classList.toggle('active', catName === 'bonus');
 
       renderWidgetsGrid();
       renderStepCards();
@@ -828,7 +825,7 @@
     }
 
     // Initial Load
-    switchCategory('b2b');
+    switchCategory('core');
   </script>
 </body>
 </html>
