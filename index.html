@@ -569,32 +569,7 @@
           }
         }
       },
-      trust_badges: {
-        title: "Trust Badges",
-        icon: "🔒",
-        steps: [
-          { title: "Open Editor", desc: "Open the Theme Editor and navigate to your Product page template.", btnHtml: `<a href="${customizerUrl}" class="btn-polaris" target="_top">Open Editor</a>` },
-          { title: "Place Badges", desc: "Drag and drop the Checkout Trust Badges block below your buy form.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(2)">Show placement guide</button>` },
-          { title: "Toggle Badges", desc: "Select which payment method SVGs to show to customers.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(3)">Show toggling guide</button>` }
-        ],
-        guides: {
-          1: {
-            title: "Step 1: Open Theme Customizer & Navigate to Product Template",
-            why: { badge: "Why do this?", title: "Target the Product Page Layout", desc: "The Checkout Trust Badges widget is an App Block, meaning you can place it exactly where you want it. Renders beautiful secure checkout payment icons right beneath your Buy Now button." },
-            how: { badge: "How to do it?", title: "Open Product Layout", desc: "1. Click the green <strong>Open Editor</strong> button in Step 1.<br>2. In the top-center dropdown menu, select **Products** ➔ **Default product**." }
-          },
-          2: {
-            title: "Step 2: Drag and Drop the Checkout Trust Badges Block",
-            why: { badge: "Why do this?", title: "Inject Trust Directly Below the Purchase Decisions", desc: "Placing secure checkout guarantees directly beneath the 'Add to Cart' or 'Buy It Now' buttons is a proven layout to reduce hesitation and cart abandonment." },
-            how: { badge: "How to do it?", title: "Injecting the block", desc: "1. In the left sidebar of the customizer under the **Product Information** section list, click **Add block**.<br>2. Select **Checkout Trust Badges**.<br>3. Drag it up or down to place it directly beneath the product form / buy buttons.<br>4. Click **Save**." }
-          },
-          3: {
-            title: "Step 3: Toggle Supported Payment Icons & Edit Messages",
-            why: { badge: "Why do this?", title: "Match Your Accepted Checkout Options", desc: "Merchants want to display only the payment networks they actually support. You can toggle icons on or off (Visa, MasterCard, PayPal, Apple Pay, etc.) and write a custom trust subtitle." },
-            how: { badge: "How to do it?", title: "Configure Settings", desc: "1. Click on the **Checkout Trust Badges** block in your left sidebar layout.<br>2. In the settings panel on the right, edit:<br>- **Heading Text:** Set the trust title (e.g. *Guaranteed Safe & Secure Checkout*).<br>- **Toggles:** Check the boxes next to the logos you want to display (Visa, Mastercard, Paypal, Apple Pay, Google Pay, Amex).<br>- **Secondary Message:** Customize the lock/SSL text at the bottom.<br>3. Click **Save** in the top right." }
-          }
-        }
-      },
+
       flash_timer: {
         title: "Flash Sale Timer",
         icon: "⏱️",
@@ -731,7 +706,7 @@
     const categoryWidgets = {
       b2b: ['wholesale'],
       cart: ['cart_recovery', 'shipping_tracker', 'sticky_cart', 'back_to_top'],
-      conversion: ['file_uploader', 'scarcity_alerts', 'trust_badges', 'flash_timer', 'sizing_guide', 'collapsible_faq', 'related_products', 'quick_view']
+      conversion: ['file_uploader', 'scarcity_alerts', 'flash_timer', 'sizing_guide', 'collapsible_faq', 'related_products', 'quick_view']
     };
 
     function switchCategory(catName) {
