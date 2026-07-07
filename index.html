@@ -549,7 +549,7 @@
         steps: [
           { title: "Open Editor", desc: "Open the Theme Editor and navigate to your Product page template.", btnHtml: `<a href="${customizerUrl}" class="btn-polaris" target="_top">Open Editor</a>` },
           { title: "Place Block", desc: "Drag and drop the Scarcity Alerts block where you want it on the page.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(2)">Show placement guide</button>` },
-          { title: "Define Threshold", desc: "Configure stock levels and view counts to trigger alerts.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(3)">Show settings guide</button>` }
+          { title: "Define Threshold", desc: "Configure stock levels to trigger low inventory warnings.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(3)">Show settings guide</button>` }
         ],
         guides: {
           1: {
@@ -563,9 +563,9 @@
             how: { badge: "How to do it?", title: "Injecting the block", desc: "1. In the left sidebar of the customizer, look for the **Product Information** section list.<br>2. Click **Add block** at the bottom of that list.<br>3. Scroll down and select **Urgency & Scarcity Alerts** under *Apps*.<br>4. Hover over the block, grab the six-dot grid handle, and drag it up or down to place it exactly where you want it (e.g. right below the price)." }
           },
           3: {
-            title: "Step 3: Configure Stock Alert Thresholds & Visitor Counter Ranges",
-            why: { badge: "Why do this?", title: "Establish Urgency Parameters", desc: "Define when the stock warning shows (so it only alerts visitors when stock is actually low) and customize the social proof visitor counter ranges." },
-            how: { badge: "How to do it?", title: "Configure Settings", desc: "1. Click directly on the **Urgency & Scarcity Alerts** block in your left sidebar layout.<br>2. In the settings panel on the right, configure:<br>- **Inventory Alert Threshold:** Set the quantity limit (e.g. <code>10</code> items) below which the alert triggers.<br>- **Stock Scarcity Text:** Customize the alert text. Use <code>[stock]</code> where you want the live inventory count to appear.<br>- **Show Visitor Count:** Toggle the viewer counter.<br>- **Minimum / Maximum Viewers:** Define the random range for viewers (e.g. 5 to 20).<br>3. Click **Save** in the top right." }
+            title: "Step 3: Configure Stock Alert Thresholds",
+            why: { badge: "Why do this?", title: "Establish Low Stock Urgency", desc: "Define when the stock warning shows (so it only alerts visitors when stock is actually low). This is 100% legal, compliant, and honest!" },
+            how: { badge: "How to do it?", title: "Configure Settings", desc: "1. Click directly on the **Urgency & Scarcity Alerts** block in your left sidebar layout.<br>2. In the settings panel on the right, configure:<br>- **Inventory Alert Threshold:** Set the quantity limit (e.g. <code>10</code> items) below which the alert triggers.<br>- **Stock Scarcity Text:** Customize the alert text. Use <code>[stock]</code> where you want the live inventory count to appear.<br>3. Click **Save** in the top right." }
           }
         }
       },
