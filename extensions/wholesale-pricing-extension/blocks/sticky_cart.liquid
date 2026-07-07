@@ -47,12 +47,17 @@
     }
 
     function initStickyCart() {
+      console.log("[Sticky Cart] Initializing widget...");
+      
       const container = document.getElementById('sticky-cart-{{ block.id }}');
       const submitBtn = document.getElementById('sticky-btn-{{ block.id }}');
       const variantSelect = document.getElementById('sticky-select-{{ block.id }}');
       const priceEl = document.getElementById('sticky-price-{{ block.id }}');
 
-      if (!container || !submitBtn) return;
+      if (!container || !submitBtn) {
+        console.error("[Sticky Cart] Required DOM elements not found!");
+        return;
+      }
 
       const position = '{{ block.settings.sticky_position | default: "bottom" }}';
       container.className = `sticky-cart-bar-wrapper sticky-pos-${position}`;
@@ -61,14 +66,20 @@
       const enabledDesktop = {{ block.settings.enabled_on_desktop | default: true }};
 
       const isMobile = window.innerWidth <= 768;
-      if (isMobile && !enabledMobile) return;
-      if (!isMobile && !enabledDesktop) return;
+      if (isMobile && !enabledMobile) {
+        console.log("[Sticky Cart] Disabled on Mobile by settings.");
+        return;
+      }
+      if (!isMobile && !enabledDesktop) {
+        console.log("[Sticky Cart] Disabled on Desktop by settings.");
+        return;
+      }
 
       container.style.display = 'block';
 
       const productForm = document.querySelector("form[action*='/cart/add']") || document.querySelector('.product-form');
-      
       if (productForm) {
+        console.log("[Sticky Cart] Product form found. Attaching scroll listener...");
         window.addEventListener('scroll', function() {
           const formRect = productForm.getBoundingClientRect();
           if (formRect.bottom < 0) {
@@ -77,6 +88,8 @@
             container.classList.remove('is-visible');
           }
         });
+      } else {
+        console.warn("[Sticky Cart] Could not find the main product Add to Cart form on the page!");
       }
 
       if (variantSelect) {
@@ -129,7 +142,7 @@
           }, 1500);
         })
         .catch(error => {
-          console.error('Error adding to cart', error);
+          console.error('[Sticky Cart] Add to Cart failed:', error);
           if (originalLabel) originalLabel.textContent = 'Error!';
           submitBtn.disabled = false;
         });
