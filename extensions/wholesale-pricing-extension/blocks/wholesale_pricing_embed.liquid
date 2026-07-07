@@ -239,7 +239,8 @@
       
       function parseTiers(str) {
         const parsed = [];
-        const items = str.split(',');
+        // Split by either semicolon (;) or comma (,) to support Shopify tag delimited inputs
+        const items = str.split(/[;,]/);
         items.forEach(item => {
           const parts = item.trim().split(':');
           const qty = parseInt(parts[0], 10);
@@ -257,7 +258,8 @@
           }
           
           const value = parseFloat(rawValue);
-          if (!isNaN(qty) && !isNaN(value) && qty > 1) {
+          // Allow qty starting at 1 to override the base price
+          if (!isNaN(qty) && !isNaN(value) && qty >= 1) {
             parsed.push({
               minQty: qty,
               value: value,
@@ -285,16 +287,21 @@
           return;
         }
 
-        // Generate base tier HTML (1 to Tier1_min - 1)
-        const baseMaxQty = customTiers[0].minQty - 1;
-        let gridHtml = `
-          <div class="wholesale-tier-card active" data-min-qty="1" data-max-qty="${baseMaxQty}" data-discount-value="0" data-price="${variantPrice}" data-discount-code="">
-            <div class="wholesale-tier-qty">1 ${baseMaxQty > 1 ? `- ${baseMaxQty}` : ''} item${baseMaxQty > 1 ? 's' : ''}</div>
-            <div class="wholesale-tier-price" data-price="${variantPrice}">${formatMoney(variantPrice)}</div>
-            <div class="wholesale-tier-discount">Regular Price</div>
-            <div class="wholesale-tier-status"><span class="status-dot"></span> Current</div>
-          </div>
-        `;
+        // Generate base tier HTML (1 to Tier1_min - 1) if first tier starts above 1
+        const firstTierMin = customTiers[0] ? customTiers[0].minQty : 1;
+        let gridHtml = '';
+
+        if (firstTierMin > 1) {
+          const baseMaxQty = firstTierMin - 1;
+          gridHtml = `
+            <div class="wholesale-tier-card active" data-min-qty="1" data-max-qty="${baseMaxQty}" data-discount-value="0" data-price="${variantPrice}" data-discount-code="">
+              <div class="wholesale-tier-qty">1 ${baseMaxQty > 1 ? `- ${baseMaxQty}` : ''} item${baseMaxQty > 1 ? 's' : ''}</div>
+              <div class="wholesale-tier-price" data-price="${variantPrice}">${formatMoney(variantPrice)}</div>
+              <div class="wholesale-tier-discount">Regular Price</div>
+              <div class="wholesale-tier-status"><span class="status-dot"></span> Current</div>
+            </div>
+          `;
+        }
 
         // Generate dynamically configured tiers
         customTiers.forEach((tier, index) => {
