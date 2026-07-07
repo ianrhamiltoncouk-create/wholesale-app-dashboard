@@ -24,15 +24,26 @@
     }
 
     function initFreeShippingTracker() {
+      console.log("[Shipping Tracker] Initializing...");
+      
       const container = document.getElementById('fs-tracker-{{ block.id }}');
       const messageEl = document.getElementById('fs-message-{{ block.id }}');
       const fillEl = document.getElementById('fs-fill-{{ block.id }}');
       
-      if (!container || !messageEl || !fillEl) return;
+      if (!container || !messageEl || !fillEl) {
+        console.error("[Shipping Tracker] Required DOM elements not found!");
+        return;
+      }
 
-      const threshold = parseFloat('{{ block.settings.shipping_threshold | default: 75 }}') * 100;
-      const position = '{{ block.settings.position | default: "top_banner" }}';
+      // Safe threshold parsing
+      let thresholdSetting = '{{ block.settings.shipping_threshold }}';
+      let parsedThreshold = parseFloat(thresholdSetting);
+      if (isNaN(parsedThreshold) || parsedThreshold <= 0) {
+        parsedThreshold = 75; // Fallback to 75
+      }
+      const threshold = parsedThreshold * 100; // Convert to cents
       
+      const position = '{{ block.settings.position | default: "top_banner" }}';
       container.className = `free-shipping-tracker-container fs-pos-${position}`;
 
       const barColor = '{{ block.settings.bar_color | default: "#10b981" }}';
@@ -43,6 +54,7 @@
           .then(res => res.json())
           .then(cart => {
             const total = cart.total_price;
+            console.log("[Shipping Tracker] Current Cart Subtotal:", total, "cents. Threshold is:", threshold, "cents.");
             
             if (total === 0) {
               container.style.display = 'none';
@@ -65,7 +77,7 @@
               messageEl.innerHTML = progressText.replace('[amount]', `<strong>${remainingFormatted}</strong>`);
             }
           })
-          .catch(err => console.error('Error loading Free Shipping tracker', err));
+          .catch(err => console.error('[Shipping Tracker] Error loading cart', err));
       }
 
       function formatFSMoney(cents) {
@@ -74,17 +86,32 @@
         return `${shopCurrencySymbol}${amount}`;
       }
 
+      // Initial run
       updateTracker();
 
+      // 1. Intercept Fetch API requests
       const nativeFetch = window.fetch;
       window.fetch = function() {
         return nativeFetch.apply(this, arguments).then(response => {
           const url = arguments[0];
           if (typeof url === 'string' && (url.includes('/cart/add') || url.includes('/cart/change') || url.includes('/cart/clear') || url.includes('/cart/update'))) {
-            setTimeout(updateTracker, 500);
+            console.log("[Shipping Tracker] Cart mutation detected via fetch(). Updating...");
+            setTimeout(updateTracker, 600);
           }
           return response;
         });
+      };
+
+      // 2. Intercept XMLHttpRequests (handles jQuery, AJAX drawers, and older themes)
+      const nativeOpen = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function(method, url) {
+        this.addEventListener('load', function() {
+          if (typeof url === 'string' && (url.includes('/cart/add') || url.includes('/cart/change') || url.includes('/cart/clear') || url.includes('/cart/update'))) {
+            console.log("[Shipping Tracker] Cart mutation detected via XHR. Updating...");
+            setTimeout(updateTracker, 600);
+          }
+        });
+        return nativeOpen.apply(this, arguments);
       };
     }
   })();
