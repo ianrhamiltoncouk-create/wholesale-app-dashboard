@@ -243,11 +243,21 @@
         items.forEach(item => {
           const parts = item.trim().split(':');
           const qty = parseInt(parts[0], 10);
-          const value = parseFloat(parts[1]);
+          
+          let rawValue = parts[1] ? parts[1].trim() : '';
+          let isFixed = false;
+          
+          if (rawValue.includes('$')) {
+            isFixed = true;
+            rawValue = rawValue.replace('$', '');
+          }
+          
+          const value = parseFloat(rawValue);
           if (!isNaN(qty) && !isNaN(value) && qty > 1) {
             parsed.push({
               minQty: qty,
               value: value,
+              isFixed: isFixed,
               code: `BULK${qty}` // Automatically maps to BULK5, BULK10, etc.
             });
           }
@@ -274,7 +284,7 @@
         // Generate base tier HTML (1 to Tier1_min - 1)
         const baseMaxQty = customTiers[0].minQty - 1;
         let gridHtml = `
-          <div class="wholesale-tier-card active" data-min-qty="1" data-max-qty="${baseMaxQty}" data-discount-value="0" data-discount-code="">
+          <div class="wholesale-tier-card active" data-min-qty="1" data-max-qty="${baseMaxQty}" data-discount-value="0" data-price="${variantPrice}" data-discount-code="">
             <div class="wholesale-tier-qty">1 ${baseMaxQty > 1 ? `- ${baseMaxQty}` : ''} item${baseMaxQty > 1 ? 's' : ''}</div>
             <div class="wholesale-tier-price" data-price="${variantPrice}">${formatMoney(variantPrice)}</div>
             <div class="wholesale-tier-discount">Regular Price</div>
@@ -286,19 +296,23 @@
         customTiers.forEach((tier, index) => {
           const nextTier = customTiers[index + 1];
           const maxQty = nextTier ? nextTier.minQty - 1 : null;
-          const discountedPrice = variantPrice * (1 - tier.value / 100.0);
+          
+          const discountedPrice = tier.isFixed ? Math.round(tier.value * 100) : (variantPrice * (1 - tier.value / 100.0));
+          const pct = Math.round(((variantPrice - discountedPrice) / variantPrice) * 100);
+          const discountLabel = (pct > 0) ? `${pct}% OFF` : `Special Price`;
 
           gridHtml += `
             <div class="wholesale-tier-card" 
                  data-min-qty="${tier.minQty}" 
                  ${maxQty ? `data-max-qty="${maxQty}"` : ''} 
+                 data-price="${discountedPrice}"
                  data-discount-value="${tier.value}" 
                  data-discount-code="${tier.code}">
               <div class="wholesale-tier-qty">
                 ${maxQty ? `${tier.minQty} - ${maxQty}` : `${tier.minQty}+`} items
               </div>
               <div class="wholesale-tier-price" data-price="${discountedPrice}">${formatMoney(discountedPrice)}</div>
-              <div class="wholesale-tier-discount">${tier.value}% OFF</div>
+              <div class="wholesale-tier-discount">${discountLabel}</div>
               <div class="wholesale-tier-status"><span class="status-dot"></span> Select</div>
             </div>
           `;
@@ -375,9 +389,18 @@
           const neededQty = nextTier.minQty - currentQty;
           const progressPercent = Math.min(100, (currentQty / nextTier.minQty) * 100);
 
+          let nextTierLabel = '';
+          if (nextTier.isFixed) {
+            const nextDiscountedPrice = Math.round(nextTier.value * 100);
+            const pct = Math.round(((variantPrice - nextDiscountedPrice) / variantPrice) * 100);
+            nextTierLabel = pct > 0 ? `${pct}% OFF` : `$${nextTier.value.toFixed(2)} each`;
+          } else {
+            nextTierLabel = `${nextTier.value}% OFF`;
+          }
+
           const hintEl = progressWrapper.querySelector('.wholesale-progress-hint');
           if (hintEl) {
-            hintEl.innerHTML = `Add <strong>${neededQty} more</strong> to unlock <strong>${nextTier.value}% OFF</strong>`;
+            hintEl.innerHTML = `Add <strong>${neededQty} more</strong> to unlock <strong>${nextTierLabel}</strong>`;
           }
 
           const barFill = progressWrapper.querySelector('.wholesale-progress-bar-fill');
