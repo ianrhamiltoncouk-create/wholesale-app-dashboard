@@ -324,13 +324,30 @@
 
     let cartItemCount = {{ cart.item_count | default: 0 }};
     
-    // Update the cart count in the background after page loads to ensure accuracy
-    fetch('/cart.js')
-      .then(res => res.json())
-      .then(cart => {
-        cartItemCount = cart.item_count;
-      })
-      .catch(err => console.error('Error fetching background cart count', err));
+    function refreshCartCount() {
+      fetch('/cart.js')
+        .then(res => res.json())
+        .then(cart => {
+          cartItemCount = cart.item_count;
+        })
+        .catch(err => console.error('Error fetching background cart count', err));
+    }
+
+    // Refresh immediately on load
+    refreshCartCount();
+
+    // Intercept AJAX add-to-cart operations (handles cart drawers, slide-out carts)
+    const nativeFetch = window.fetch;
+    window.fetch = function() {
+      return nativeFetch.apply(this, arguments).then(response => {
+        const url = arguments[0];
+        if (typeof url === 'string' && (url.includes('/cart/add') || url.includes('/cart/change') || url.includes('/cart/clear') || url.includes('/cart/update'))) {
+          // Wait a split second for cart database to update, then sync count
+          setTimeout(refreshCartCount, 400);
+        }
+        return response;
+      });
+    };
 
     if (enableCartBtn && isCartPage) {
       const checkoutBtnSelectors = [
