@@ -58,9 +58,11 @@
   }
 
   (function() {
-    document.addEventListener('DOMContentLoaded', function() {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', renderSizingChart);
+    } else {
       renderSizingChart();
-    });
+    }
 
     function renderSizingChart() {
       const headersContainer = document.getElementById('sg-headers-{{ block.id }}');

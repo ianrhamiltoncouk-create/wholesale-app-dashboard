@@ -19,9 +19,11 @@
   }
 
   (function() {
-    document.addEventListener('DOMContentLoaded', function() {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initBackToTop);
+    } else {
       initBackToTop();
-    });
+    }
 
     function initBackToTop() {
       const btn = document.getElementById('btt-btn-{{ block.id }}');

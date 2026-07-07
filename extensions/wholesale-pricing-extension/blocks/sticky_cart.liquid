@@ -40,9 +40,11 @@
 
   <script>
   (function() {
-    document.addEventListener('DOMContentLoaded', function() {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initStickyCart);
+    } else {
       initStickyCart();
-    });
+    }
 
     function initStickyCart() {
       const container = document.getElementById('sticky-cart-{{ block.id }}');

@@ -32,9 +32,11 @@
 
   <script>
   (function() {
-    document.addEventListener('DOMContentLoaded', function() {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', injectWholesalePricingWidget);
+    } else {
       injectWholesalePricingWidget();
-    });
+    }
 
     function injectWholesalePricingWidget() {
       const targetSelector = "form[action*='/cart/add']";

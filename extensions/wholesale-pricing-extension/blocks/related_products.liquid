@@ -13,9 +13,11 @@
 
 <script>
   (function() {
-    document.addEventListener('DOMContentLoaded', function() {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadRelatedRecommendations);
+    } else {
       loadRelatedRecommendations();
-    });
+    }
 
     function loadRelatedRecommendations() {
       const container = document.getElementById('rp-{{ block.id }}');

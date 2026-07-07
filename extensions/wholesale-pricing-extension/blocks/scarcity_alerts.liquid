@@ -31,9 +31,11 @@
 
 <script>
   (function() {
-    document.addEventListener('DOMContentLoaded', function() {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initScarcityAlerts);
+    } else {
       initScarcityAlerts();
-    });
+    }
 
     function initScarcityAlerts() {
       const container = document.getElementById('scarcity-{{ block.id }}');

@@ -8,9 +8,11 @@
   <!-- Embed configuration check -->
   <script>
   (function() {
-    document.addEventListener('DOMContentLoaded', function() {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', injectCustomUploaderWidget);
+    } else {
       injectCustomUploaderWidget();
-    });
+    }
 
     function injectCustomUploaderWidget() {
       const targetSelector = "form[action*='/cart/add']";

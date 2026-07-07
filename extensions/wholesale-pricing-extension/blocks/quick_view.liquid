@@ -42,9 +42,11 @@
   }
 
   (function() {
-    document.addEventListener('DOMContentLoaded', function() {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', injectQuickViewTriggers);
+    } else {
       injectQuickViewTriggers();
-    });
+    }
 
     function injectQuickViewTriggers() {
       const productLinks = document.querySelectorAll('a[href*="/products/"]');
