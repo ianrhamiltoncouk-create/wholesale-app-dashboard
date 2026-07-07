@@ -22,6 +22,22 @@
       endfor
     endif
 
+    # Restrict to products tagged with target tag
+    if show_widget and block.settings.only_on_tagged_products
+      assign product_has_tag = false
+      for tag in product.tags
+        assign downcased_tag = tag | downcase
+        assign target_product_tag = block.settings.product_tag | downcase
+        if downcased_tag == target_product_tag
+          assign product_has_tag = true
+          break
+        endif
+      endfor
+      if product_has_tag == false
+        assign show_widget = false
+      endif
+    endif
+
     assign current_variant = product.selected_or_first_available_variant
   -%}
 
@@ -474,6 +490,19 @@
       "id": "custom_tag",
       "label": "Wholesale Customer Tag",
       "default": "wholesale"
+    },
+    {
+      "type": "checkbox",
+      "id": "only_on_tagged_products",
+      "label": "Limit to Specific Products (Tags)",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "product_tag",
+      "label": "Trigger Product Tag",
+      "default": "bulk-pricing",
+      "info": "Wholesale pricing will only load on products containing this tag."
     },
     {
       "type": "text",
