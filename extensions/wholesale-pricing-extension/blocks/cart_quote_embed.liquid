@@ -324,22 +324,27 @@
 
     let cartItemCount = {{ cart.item_count | default: 0 }};
     
+    function checkAndResetSessionLock() {
+      const storedCount = parseInt(sessionStorage.getItem('last_cart_count') || '0', 10);
+      if (cartItemCount > storedCount) {
+        // Cart count increased (either via reload or AJAX)! Clear the lock.
+        sessionStorage.removeItem('quote_modal_shown');
+      }
+      sessionStorage.setItem('last_cart_count', cartItemCount.toString());
+    }
+
     function refreshCartCount() {
-      const prevCount = cartItemCount;
       fetch('/cart.js')
         .then(res => res.json())
         .then(cart => {
           cartItemCount = cart.item_count;
-          // If customer added more items, reset the exit-intent lock so they can be prompted again
-          if (cartItemCount > prevCount) {
-            sessionStorage.removeItem('quote_modal_shown');
-            hasShownExitIntent = false;
-          }
+          checkAndResetSessionLock();
         })
         .catch(err => console.error('Error fetching background cart count', err));
     }
 
-    // Refresh immediately on load
+    // Run initial sync on load
+    checkAndResetSessionLock();
     refreshCartCount();
 
     // Intercept AJAX add-to-cart operations (handles cart drawers, slide-out carts)
@@ -348,7 +353,6 @@
       return nativeFetch.apply(this, arguments).then(response => {
         const url = arguments[0];
         if (typeof url === 'string' && (url.includes('/cart/add') || url.includes('/cart/change') || url.includes('/cart/clear') || url.includes('/cart/update'))) {
-          // Wait a split second for cart database to update, then sync count
           setTimeout(refreshCartCount, 400);
         }
         return response;
@@ -386,25 +390,22 @@
     }
 
     {% if block.settings.enable_exit_intent %}
-      if (!sessionStorage.getItem('quote_modal_shown')) {
-        // Trigger instantly when mouse leaves the document window area
-        document.addEventListener('mouseleave', function(e) {
-          if (cartItemCount > 0 && !hasShownExitIntent) {
-            hasShownExitIntent = true;
-            sessionStorage.setItem('quote_modal_shown', 'true');
-            openCartQuoteModal();
-          }
-        });
+      // Always listen to exit intent, but evaluate the session lock dynamically inside the event
+      document.addEventListener('mouseleave', function(e) {
+        if (cartItemCount > 0 && !sessionStorage.getItem('quote_modal_shown') && !hasShownExitIntent) {
+          hasShownExitIntent = true;
+          sessionStorage.setItem('quote_modal_shown', 'true');
+          openCartQuoteModal();
+        }
+      });
 
-        // Fallback for fast cursor exit tracking
-        document.addEventListener('mouseout', function(e) {
-          if (e.clientY < 20 && cartItemCount > 0 && !hasShownExitIntent) {
-            hasShownExitIntent = true;
-            sessionStorage.setItem('quote_modal_shown', 'true');
-            openCartQuoteModal();
-          }
-        });
-      }
+      document.addEventListener('mouseout', function(e) {
+        if (e.clientY < 20 && cartItemCount > 0 && !sessionStorage.getItem('quote_modal_shown') && !hasShownExitIntent) {
+          hasShownExitIntent = true;
+          sessionStorage.setItem('quote_modal_shown', 'true');
+          openCartQuoteModal();
+        }
+      });
     {% endif %}
 
     if (form) {
