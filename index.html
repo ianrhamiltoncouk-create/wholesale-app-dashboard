@@ -721,7 +721,7 @@
         icon: "🏷️",
         steps: [
           { title: "Open Editor", desc: "Open the Theme Editor to enable widgets.", btnHtml: `<a href="${customizerUrl}" class="btn-polaris" target="_top">Open Editor</a>` },
-          { title: "Configure Tiers", desc: "Set up bulk quantities & discount values.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(2)">Show pricing guide</button>` },
+          { title: "Tag Products", desc: "Copy the tag from the generator above and paste it.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(2)">Show tagging guide</button>` },
           { title: "Create Discounts", desc: "Map discount codes to match values.", btnHtml: `<a href="${discountsUrl}" class="btn-polaris btn-secondary" target="_top">Create Discounts</a>` },
           { title: "Approve Users", desc: "Tag customers with 'wholesale' to unlock.", btnHtml: `<a href="${customersUrl}" class="btn-polaris btn-secondary" target="_top">Approve Users</a>` }
         ],
@@ -732,10 +732,9 @@
             how: { badge: "How to do it?", title: "5-Second Setup", desc: "1. Click the green <strong>Open Editor</strong> button in Step 1.<br>2. At the top-left of the Theme Customizer window, click the <strong>4th icon</strong> (the shapes icon) to open the <strong>App embeds</strong> menu.<br>3. Switch the toggles to **ON** for <strong>Wholesale Auto-Pricing</strong>.<br>4. Click **Save** in the top right." }
           },
           2: {
-            title: "Step 2: Configure Wholesale Pricing Tiers",
-            why: { badge: "Why do this?", title: "Specify Bulk Quantities & Discount Rates", desc: "To make wholesale buying appealing, you must define your pricing tiers. This step tells the storefront widget exactly what volume levels correspond to what discount rates." },
-            how: { badge: "How to do it?", title: "Setting Your Tiers", desc: "1. Inside the Theme Customizer, click directly on the text <strong>\"Wholesale Auto-Pricing\"</strong> in the left sidebar.<br>2. A settings panel will open on the <strong>right-hand side of your screen</strong>.<br>3. Look for the **Wholesale Tiers (Qty:Discount%)** input box.<br>4. Type your tiers in the format `MinQty:Discount%` separated by commas. For example: `5:10, 10:15, 20:20` means buying 5+ items gets 10% off, 10+ items gets 15% off, and 20+ items gets 20% off.<br>5. Click **Save** in the top right." },
-            underHood: { badge: "💡 Pro Tip", title: "Product-Specific Custom Pricing", desc: "Want unique tiers or **fixed unit prices** (e.g. £14.99 each) on specific products instead of your global rules?<br><br>1. In the theme editor settings panel, turn **ON** <em>\"Limit to Specific Products (Tags)\"</em>.<br>2. In your Shopify Product list, click the target product, and tag it using **semicolons (;)** to split rules:<br>- **Use Global Settings:** Add tag <code>bulk-pricing</code><br>- **Custom Percentages:** Add tag <code>bulk-rules=5:10;10:20</code> (gives 10% off for 5+, 20% off for 10+)<br>- **Custom Fixed Prices:** Add tag <code>bulk-rules=1:£14.99;5:£11.95</code> (gives £14.99 each for 1-4 items, £11.95 each for 5+ items)" }
+            title: "Step 2: Tag Your Products with Custom Rules",
+            why: { badge: "Why do this?", title: "Enable Custom Tiers on Product Pages", desc: "By tagging individual products, you specify custom discount tiers or fixed pricing rules that only apply to those items. If a product has no tag, it defaults back to your global settings." },
+            how: { badge: "How to do it?", title: "Pasting the Tag", desc: "1. Scroll to the **Visual Tag Generator** at the top of this dashboard.<br>2. Build your tiers visually (add rows, choose fixed price or percentage, set quantities).<br>3. Click the green **Copy Tag to Clipboard** button.<br>4. Go to your **Shopify Admin ➔ Products** and click on your target product.<br>5. Paste the tag in the **Tags** field on the right sidebar and click **Save**." }
           },
           3: {
             title: "Step 3: Create Matching Discount Codes in Shopify",
@@ -1093,6 +1092,8 @@
       grid.innerHTML = html;
     }
 
+
+
     function selectWidget(widgetId) {
       activeWidget = widgetId;
       activeStep = 1;
@@ -1107,20 +1108,19 @@
         }
       });
 
+      // Toggle visual workspace visibility
+      document.getElementById('visualWorkspace').style.display = widgetId === 'wholesale' ? 'block' : 'none';
       if (widgetId === 'wholesale') {
-        document.getElementById('stepSectionHeader').style.display = 'none';
-        document.getElementById('stepsGrid').style.display = 'none';
-        document.getElementById('instructionPanel').style.display = 'none';
-        document.getElementById('visualWorkspace').style.display = 'block';
         initVisualBuilderWorkspace();
-      } else {
-        document.getElementById('stepSectionHeader').style.display = 'block';
-        document.getElementById('stepsGrid').style.display = 'grid';
-        document.getElementById('instructionPanel').style.display = 'block';
-        document.getElementById('visualWorkspace').style.display = 'none';
-        renderStepCards();
-        selectStep(1);
       }
+
+      // Always render steps grid and instructions panel
+      document.getElementById('stepSectionHeader').style.display = 'block';
+      document.getElementById('stepsGrid').style.display = 'grid';
+      document.getElementById('instructionPanel').style.display = 'block';
+      
+      renderStepCards();
+      selectStep(1);
     }
 
     // Visual Builder state variables
