@@ -92,7 +92,7 @@
     }
     .widgets-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       gap: 1rem;
       margin-bottom: 2rem;
     }
@@ -427,7 +427,7 @@
         }
       },
       shipping_tracker: {
-        title: "Free Shipping Tracker",
+        title: "Free Shipping Progress",
         icon: "🚚",
         steps: [
           { title: "Enable Tracker", desc: "Open the Theme Editor and turn the Free Shipping Progress toggle ON.", btnHtml: `<a href="${customizerUrl}" class="btn-polaris" target="_top">Open Editor</a>` },
@@ -448,7 +448,7 @@
           3: {
             title: "Step 3: Test Dynamic Cart Syncing on Your Storefront",
             why: { badge: "Why do this?", title: "Ensure the Progress Bar Updates in Real-Time", desc: "Testing validates that when items are added or quantities change, the progress bar fills up instantly without requiring the customer to reload the page." },
-            how: { badge: "How to test", title: "Verify Cart Sync", desc: "1. Go to your storefront and add a low-cost item to your cart.<br>2. **Result:** The progress bar will slide in showing exactly how much more you need to spend.<br>3. Add another item ➔ **Result:** The green bar will dynamically fill up, and the remaining amount will decrease. once you hit the goal, it will show your congratulations message!" }
+            how: { badge: "How to test", title: "Verify Cart Sync", desc: "1. Go to your storefront and add a low-cost item to your cart.<br>2. **Result:** The progress bar will slide in showing exactly how much more you need to spend.<br>3. Add another item ➔ **Result:** The green bar will dynamically fill up, and the remaining amount will decrease." }
           }
         }
       },
@@ -474,7 +474,33 @@
           3: {
             title: "Step 3: Test Scroll Activation on Your Storefront",
             why: { badge: "Why do this?", title: "Ensure the Bar Slides in Smoothly", desc: "Testing ensures the bar remains hidden initially, and only appears once the customer has scrolled past the main buy button." },
-            how: { badge: "How to test", title: "Scroll Test", desc: "1. Go to any product page on your storefront.<br>2. Scroll down past the product price and the main Add to Cart form.<br>3. **Result:** The sticky bar will slide onto your screen smoothly, showing the product image, title, variant dropdown, and buy button. Try selecting a variant and clicking Add to Cart!" }
+            how: { badge: "How to test", title: "Scroll Test", desc: "1. Go to any product page on your storefront.<br>2. Scroll down past the product price and the main Add to Cart form.<br>3. **Result:** The sticky bar will slide onto your screen smoothly. Try selecting a variant and clicking Add to Cart!" }
+          }
+        }
+      },
+      back_to_top: {
+        title: "Back to Top Button",
+        icon: "⬆️",
+        steps: [
+          { title: "Enable Button", desc: "Open the Theme Editor and turn the Back to Top Button toggle ON.", btnHtml: `<a href="${customizerUrl}" class="btn-polaris" target="_top">Open Editor</a>` },
+          { title: "Set Threshold", desc: "Define how far down (in pixels) the customer scrolls before the button appears.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(2)">Show settings guide</button>` },
+          { title: "Test Smooth Scroll", desc: "Scroll down a page and click the button to verify it scrolls up smoothly.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(3)">Show testing flow</button>` }
+        ],
+        guides: {
+          1: {
+            title: "Step 1: Open Theme Customizer & Enable Back to Top Button",
+            why: { badge: "Why do this?", title: "Improve Mobile Navigation & Usability", desc: "When customers scroll down long lists of collections or descriptions, scrolling manually back to the top can be tedious. A floating button solves this friction instantly." },
+            how: { badge: "How to do it?", title: "Enable App Embed", desc: "1. Click the green <strong>Open Editor</strong> button in Step 1.<br>2. Go to the <strong>App embeds</strong> sidebar (4th icon at the top-left).<br>3. Toggle ON **Back to Top Button**.<br>4. Click **Save**." }
+          },
+          2: {
+            title: "Step 2: Configure Scroll Depth & Colors",
+            why: { badge: "Why do this?", title: "Keep the Button Subtle but Visible", desc: "Define how many pixels of scroll depth must occur before the button triggers. Customize the background and arrow colors to match your brand." },
+            how: { badge: "How to do it?", title: "Configure Settings", desc: "1. Inside App embeds sidebar, click directly on **\"Back to Top Button\"**.<br>2. In the right settings panel, configure:<br>- **Scroll Depth Threshold (px):** Set the pixel trigger point (default: <code>300</code>).<br>- **Button Colors:** Set the background color and arrow icon color.<br>3. Click **Save**." }
+          },
+          3: {
+            title: "Step 3: Test Dynamic Floating on Your Storefront",
+            why: { badge: "Why do this?", title: "Confirm Smooth Animating", desc: "Testing validates that the button fades in smoothly on scroll and performs a slow, smooth scroll rather than a jarring jump." },
+            how: { badge: "How to test", title: "Scroll Test", desc: "1. Go to any long page (like a collection page) on your storefront.<br>2. Scroll down past 300px.<br>3. **Result:** A floating button with an up arrow will fade into the bottom-right corner. Click it to smooth scroll back to the top!" }
           }
         }
       },
@@ -591,7 +617,111 @@
           3: {
             title: "Step 3: Set Your Expiry Date and Customize Expiry Messages",
             why: { badge: "Why do this?", title: "Initiate the Live Countdown Timer", desc: "Set the target date and time when the sale officially ends. The widget will calculate the exact remaining days, hours, minutes, and seconds and count down in real-time." },
-            how: { badge: "How to do it?", title: "Configure Settings", desc: "1. Click on the **Flash Sale Timer** block in your left sidebar layout.<br>2. In the settings panel on the right, configure:<br>- **Timer Heading:** Set the text above the timer (e.g., *Limited Time Offer! Sale Ends In:*).<br>- **End Date:** Type the end date in standard `YYYY-MM-DD` format (e.g. <code>2026-12-31</code>) or ISO format (e.g. <code>2026-12-31T23:59:59</code>). Make sure the format matches exactly!<br>- **Expired Alert Text:** The text that shows once the timer hits zero (e.g. *Offer has ended!*).<br>3. Click **Save** in the top right." }
+            how: { badge: "How to do it?", title: "Configure Settings", desc: "1. Click on the **Flash Sale Timer** block in your left sidebar layout.<br>2. In the settings panel on the right, configure:<br>- **Timer Heading:** Set the text above the timer.<br>- **End Date:** Type the end date in standard `YYYY-MM-DD` format (e.g. <code>2026-12-31</code>) or ISO format.<br>- **Expired Alert Text:** The text that shows once the timer hits zero.<br>3. Click **Save** in the top right." }
+          }
+        }
+      },
+      sizing_guide: {
+        title: "Sizing Guide",
+        icon: "📏",
+        steps: [
+          { title: "Open Editor", desc: "Open the Theme Editor and navigate to your Product page template.", btnHtml: `<a href="${customizerUrl}" class="btn-polaris" target="_top">Open Editor</a>` },
+          { title: "Place Size Link", desc: "Drag and drop the Sizing Guide Link block next to your options.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(2)">Show placement guide</button>` },
+          { title: "Configure Table", desc: "Enter your columns and sizes inside the customizer text areas.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(3)">Show table guide</button>` }
+        ],
+        guides: {
+          1: {
+            title: "Step 1: Open Theme Customizer & Navigate to Product Template",
+            why: { badge: "Why do this?", title: "Position Your Sizing Guide Link", desc: "The Sizing Guide Link is a standard App Block. This lets you place the 'Size Guide' hyperlink right next to your size selector dropdowns to prevent customer confusion." },
+            how: { badge: "How to do it?", title: "Open Product Layout", desc: "1. Click the green <strong>Open Editor</strong> button in Step 1.<br>2. In the top-center dropdown menu, select **Products** ➔ **Default product**." }
+          },
+          2: {
+            title: "Step 2: Drag and Drop the Sizing Guide Link Block",
+            why: { badge: "Why do this?", title: "Achieve Seamless Visual Integration", desc: "Placing the size guide link right above or next to your product's variant size dropdown ensures customers see it the moment they choose a size." },
+            how: { badge: "How to do it?", title: "Injecting the block", desc: "1. In the left sidebar of the customizer under the **Product Information** section list, click **Add block**.<br>2. Select **Sizing Guide Link**.<br>3. Drag it up or down to place it directly above your variant selector options block.<br>4. Click **Save**." }
+          },
+          3: {
+            title: "Step 3: Configure Table Columns, Rows, and Notes",
+            why: { badge: "Why do this?", title: "Design Your Measurement Grid", desc: "Input your custom sizes and chest/waist measurements. The block parses your text input automatically to render a beautiful HTML table inside the pop-up modal." },
+            how: { badge: "How to do it?", title: "Configure Settings", desc: "1. Click on the **Sizing Guide Link** block in your left sidebar.<br>2. In the right settings panel, configure:<br>- **Link Text:** Set the link name (e.g. <code>📏 Size Chart</code>).<br>- **Table Headers:** Type column names separated by commas (e.g. <code>Size, Chest (in), Waist (in)</code>).<br>- **Table Rows:** Type cells separated by colons (<code>:</code>) on a new line for each row (e.g. <code>S: 34-36: 28-30</code>).<br>- **Footer Note:** Add custom washing or fit info.<br>3. Click **Save** in the top right." }
+          }
+        }
+      },
+      collapsible_faq: {
+        title: "FAQ Accordion",
+        icon: "❓",
+        steps: [
+          { title: "Open Editor", desc: "Open the Theme Editor and navigate to your Product page template.", btnHtml: `<a href="${customizerUrl}" class="btn-polaris" target="_top">Open Editor</a>` },
+          { title: "Place FAQ", desc: "Drag and drop the FAQ Collapsible Accordion block onto the layout.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(2)">Show placement guide</button>` },
+          { title: "Add Q&As", desc: "Type in your collapsible tab titles and details in the textareas.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(3)">Show Q&A guide</button>` }
+        ],
+        guides: {
+          1: {
+            title: "Step 1: Open Theme Customizer & Navigate to Product Template",
+            why: { badge: "Why do this?", title: "Add Collapsible Specs & Guides", desc: "The FAQ Accordion is an App Block that lets you list detailed descriptions (like shipping terms, refund policy, materials) cleanly in expandable rows." },
+            how: { badge: "How to do it?", title: "Open Product Layout", desc: "1. Click the green <strong>Open Editor</strong> button in Step 1.<br>2. In the top-center dropdown menu, select **Products** ➔ **Default product**." }
+          },
+          2: {
+            title: "Step 2: Drag and Drop the FAQ Collapsible Accordion Block",
+            why: { badge: "Why do this?", title: "Keep Long Descriptions Clean and Tidy", desc: "Accordion lists save screen space. They hide bulky text details behind clean headers, letting the customer read only what they are interested in." },
+            how: { badge: "How to do it?", title: "Injecting the block", desc: "1. In the left sidebar of the customizer under the **Product Information** section list, click **Add block**.<br>2. Select **FAQ Collapsible Accordion**.<br>3. Drag it up or down to place it below your product description block.<br>4. Click **Save**." }
+          },
+          3: {
+            title: "Step 3: Type FAQ Accordion Tab Titles and Content Descriptions",
+            why: { badge: "Why do this?", title: "Personalize Your Information Rows", desc: "Customize the titles and detailed text inside each row. You can add shipping times, exchange policies, or washing details." },
+            how: { badge: "How to do it?", title: "Configure Settings", desc: "1. Click on the **FAQ Collapsible Accordion** block in your left sidebar.<br>2. In the right settings panel, configure:<br>- **Accordion Heading:** Set the main title (e.g. *Product Details*).<br>- **Panel Titles & Contents:** Type your titles (e.g. *Shipping & Returns*) and contents for up to 3 collapsible panels.<br>3. Click **Save** in the top right." }
+          }
+        }
+      },
+      related_products: {
+        title: "Related Products",
+        icon: "🔄",
+        steps: [
+          { title: "Open Editor", desc: "Open the Theme Editor and navigate to your Product page template.", btnHtml: `<a href="${customizerUrl}" class="btn-polaris" target="_top">Open Editor</a>` },
+          { title: "Place Slider", desc: "Drag and drop the Related Products Slider block at the bottom of the page.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(2)">Show placement guide</button>` },
+          { title: "Adjust Limits", desc: "Define your slider heading and max recommendations limit.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(3)">Show settings guide</button>` }
+        ],
+        guides: {
+          1: {
+            title: "Step 1: Open Theme Customizer & Navigate to Product Template",
+            why: { badge: "Why do this?", title: "Implement Automated Cross-Sells", desc: "The Related Products Slider is an App Block that automatically queries Shopify's built-in recommendation algorithm in the background to show relevant product suggestions." },
+            how: { badge: "How to do it?", title: "Open Product Layout", desc: "1. Click the green <strong>Open Editor</strong> button in Step 1.<br>2. In the top-center dropdown menu, select **Products** ➔ **Default product**." }
+          },
+          2: {
+            title: "Step 2: Drag and Drop the Related Products Slider Block",
+            why: { badge: "Why do this?", title: "Display Recommendations at the Foot of the Page", desc: "Placing product recommendations at the bottom of the product detail page gives customers who finished reading something else to explore, reducing bounce rates." },
+            how: { badge: "How to do it?", title: "Injecting the block", desc: "1. Scroll down to the bottom of your Customizer left sidebar layout.<br>2. Click **Add section** or **Add block** at the bottom footer template.<br>3. Select **Related Products Slider**.<br>4. Drag it to place it below your main product layout card.<br>5. Click **Save**." }
+          },
+          3: {
+            title: "Step 3: Set Your Recommendation Heading and Item Limits",
+            why: { badge: "Why do this?", title: "Tune Your Product Showcase", desc: "Set a custom header (e.g. *Complete the Look* or *You May Also Like*) and limit the number of items queried to maintain fast page speeds." },
+            how: { badge: "How to do it?", title: "Configure Settings", desc: "1. Click on the **Related Products Slider** block in your left sidebar.<br>2. In the right settings panel, configure:<br>- **Heading Text:** Set the section title.<br>- **Max Recommendations:** Select the maximum number of items (default: <code>4</code>).<br>3. Click **Save** in the top right." }
+          }
+        }
+      },
+      quick_view: {
+        title: "Quick View Pop-up",
+        icon: "👁️",
+        steps: [
+          { title: "Enable Quick View", desc: "Open the Theme Editor and turn the Quick View Pop-up toggle ON.", btnHtml: `<a href="${customizerUrl}" class="btn-polaris" target="_top">Open Editor</a>` },
+          { title: "Configure Styling", desc: "Select background colors, text colors, and button labels.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(2)">Show settings guide</button>` },
+          { title: "Test Overlay", desc: "Hover over catalog products and click Quick View to open the modal.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(3)">Show testing flow</button>` }
+        ],
+        guides: {
+          1: {
+            title: "Step 1: Open Theme Customizer & Toggle Quick View Pop-up",
+            why: { badge: "Why do this?", title: "Enable Instant Product Previews Site-Wide", desc: "Activating this App Embed auto-injects a 'Quick View' button overlay on all product collection cards on your catalog pages, letting shoppers view sizes and buy without leaving the catalog." },
+            how: { badge: "How to do it?", title: "Enable App Embed", desc: "1. Click the green <strong>Open Editor</strong> button in Step 1.<br>2. Go to the <strong>App embeds</strong> sidebar (4th icon).<br>3. Toggle ON **Quick View Pop-up**.<br>4. Click **Save**." }
+          },
+          2: {
+            title: "Step 2: Customize Button Labels and Overlay Styles",
+            why: { badge: "Why do this?", title: "Match Your Catalog Aesthetic", desc: "Customize the hover button's text, background color, and text colors to match your theme's primary buttons." },
+            how: { badge: "How to do it?", title: "Configure Settings", desc: "1. Inside App embeds sidebar, click directly on **\"Quick View Pop-up\"**.<br>2. In the right settings panel, configure:<br>- **Button Hover Text:** Set the hover label (e.g. *Quick View*).<br>- **Button Background & Text Colors:** Customize colors.<br>3. Click **Save**." }
+          },
+          3: {
+            title: "Step 3: Test Quick View Modals on Your Collection Pages",
+            why: { badge: "Why do this?", title: "Confirm Frictionless Shopping", desc: "Testing ensures that clicking the button opens the pop-up modal showing variant selectors, descriptions, and a functioning Add to Cart button." },
+            how: { badge: "How to test", title: "Testing the Overlay", desc: "1. Open any collection page on your storefront.<br>2. Hover your mouse over any product card image.<br>3. **Result:** A 'Quick View' button will fade in. Click it ➔ a beautifully formatted modal will overlay the screen with details. Select a variant and add it to cart!" }
           }
         }
       }
@@ -600,17 +730,15 @@
     // Category mappings
     const categoryWidgets = {
       b2b: ['wholesale'],
-      cart: ['cart_recovery', 'shipping_tracker', 'sticky_cart'],
-      conversion: ['file_uploader', 'scarcity_alerts', 'trust_badges', 'flash_timer']
+      cart: ['cart_recovery', 'shipping_tracker', 'sticky_cart', 'back_to_top'],
+      conversion: ['file_uploader', 'scarcity_alerts', 'trust_badges', 'flash_timer', 'sizing_guide', 'collapsible_faq', 'related_products', 'quick_view']
     };
 
     function switchCategory(catName) {
       activeCategory = catName;
-      // Default to the first widget in the newly selected category
       activeWidget = categoryWidgets[catName][0];
       activeStep = 1;
 
-      // Toggle tab buttons visual active state
       document.getElementById('tab-b2b').classList.toggle('active', catName === 'b2b');
       document.getElementById('tab-cart').classList.toggle('active', catName === 'cart');
       document.getElementById('tab-conversion').classList.toggle('active', catName === 'conversion');
@@ -645,7 +773,6 @@
       activeWidget = widgetId;
       activeStep = 1;
 
-      // Update widget card active styles
       const widgetIds = categoryWidgets[activeCategory];
       widgetIds.forEach(id => {
         const card = document.getElementById(`widget-card-${id}`);
@@ -665,7 +792,6 @@
       const widget = widgetDatabase[activeWidget];
       const steps = widget.steps;
       
-      // Update Setup Header with the widget title
       document.getElementById('stepSectionHeader').textContent = `${widget.title} Setup Steps:`;
 
       let html = '';
@@ -690,7 +816,6 @@
       const widget = widgetDatabase[activeWidget];
       const stepsCount = widget.steps.length;
 
-      // Toggle active classes on cards
       for (let i = 1; i <= stepsCount; i++) {
         const card = document.getElementById(`step-${i}-card`);
         if (card) {
@@ -698,7 +823,6 @@
         }
       }
 
-      // Update instructions panel content
       const panel = document.getElementById('instructionPanel');
       const data = widget.guides[stepNum];
       

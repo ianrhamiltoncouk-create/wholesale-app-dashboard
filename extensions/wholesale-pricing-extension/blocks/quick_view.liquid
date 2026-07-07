@@ -1,0 +1,325 @@
+{% comment %}
+  Quick View Pop-up Overlay (App Embed version with Auto-Injection)
+  Injects a "Quick View" button on collection page product cards site-wide.
+  Zero code editing required from the merchant.
+  Schema optimized for App Embed limitations (max 6 settings).
+{% endcomment %}
+
+<!-- Quick View Modal Container (Site-wide Backdrop) -->
+<div class="qv-modal-backdrop" id="qv-modal-{{ block.id }}">
+  <div class="qv-modal-card">
+    <button type="button" class="qv-modal-close" onclick="closeQuickViewModal('{{ block.id }}')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="close-icon">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+    
+    <div class="qv-modal-grid">
+      <!-- Image Left -->
+      <div class="qv-modal-image-col">
+        <img id="qv-img-{{ block.id }}" src="" alt="Product featured image">
+      </div>
+      <!-- Info Right -->
+      <div class="qv-modal-info-col">
+        <h3 class="qv-title" id="qv-title-{{ block.id }}">Product Title</h3>
+        <span class="qv-price" id="qv-price-{{ block.id }}">$0.00</span>
+        <p class="qv-description" id="qv-desc-{{ block.id }}">Loading details...</p>
+
+        <!-- Dynamic form selector -->
+        <div class="qv-form-container">
+          <div id="qv-options-{{ block.id }}"></div>
+          
+          <button type="button" class="qv-submit-btn" id="qv-btn-{{ block.id }}">
+            <span class="qv-btn-label">Add to Cart</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Button Injection styling */
+  .qv-injected-trigger-btn {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    opacity: 0;
+    background: {{ block.settings.bg_color | default: '#ffffff' }};
+    color: {{ block.settings.text_color | default: '#000000' }};
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 4px;
+    font-size: 0.725rem;
+    font-weight: 700;
+    padding: 0.4rem 0.85rem;
+    cursor: pointer;
+    white-space: nowrap;
+    z-index: 100;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  }
+  
+  /* Trigger button animations on product cards */
+  a[href*="/products/"]:hover .qv-injected-trigger-btn,
+  a[href*="/products/"] .qv-injected-trigger-btn:hover {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* Quick View Modal Backdrop */
+  .qv-modal-backdrop {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 999999;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+  }
+  .qv-modal-backdrop.is-open { opacity: 1; pointer-events: auto; }
+
+  .qv-modal-card {
+    background: var(--gradient-background, #ffffff);
+    color: rgba(var(--color-foreground), 0.75);
+    width: 90%; max-width: 700px;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+    position: relative; overflow: hidden;
+    transform: scale(0.95); transition: transform 0.3s ease;
+    border: 1px solid rgba(var(--color-foreground), 0.08);
+  }
+  .qv-modal-backdrop.is-open .qv-modal-card { transform: scale(1); }
+
+  .qv-modal-close {
+    position: absolute; top: 1rem; right: 1rem;
+    background: transparent; border: none;
+    color: rgba(var(--color-foreground), 0.4); cursor: pointer;
+    z-index: 10; padding: 0.25rem; border-radius: 50%;
+  }
+  .qv-modal-close:hover { color: rgba(var(--color-foreground), 0.9); background: rgba(0,0,0,0.05); }
+  .qv-modal-close .close-icon { width: 16px; height: 16px; }
+
+  .qv-modal-grid { display: grid; grid-template-columns: 1fr; }
+  @media (min-width: 640px) { .qv-modal-grid { grid-template-columns: 280px 1fr; } }
+
+  .qv-modal-image-col {
+    background: rgba(var(--color-foreground), 0.02);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; max-height: 380px;
+  }
+  .qv-modal-image-col img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+
+  .qv-modal-info-col { padding: 2rem; display: flex; flex-direction: column; justify-content: center; }
+  .qv-title { font-size: 1.2rem; font-weight: 800; color: inherit; margin: 0 0 0.35rem 0; }
+  .qv-price { font-size: 1rem; font-weight: 700; color: #10b981; margin-bottom: 0.85rem; display: block; }
+  
+  .qv-description {
+    font-size: 0.8rem;
+    color: rgba(var(--color-foreground), 0.55);
+    line-height: 1.4;
+    max-height: 90px;
+    overflow-y: auto;
+    margin: 0 0 1.25rem 0;
+  }
+
+  .qv-form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .qv-variant-select {
+    border: 1px solid rgba(var(--color-foreground), 0.15);
+    border-radius: 6px;
+    padding: 0.55rem;
+    font-size: 0.85rem;
+    outline: none;
+    width: 100%;
+    background: transparent;
+    color: inherit;
+  }
+
+  .qv-submit-btn {
+    background: #10b981;
+    color: white;
+    font-weight: 700;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-align: center;
+    transition: opacity 0.2s ease;
+  }
+  .qv-submit-btn:hover {
+    opacity: 0.9;
+  }
+</style>
+
+<script>
+  function closeQuickViewModal(blockId) {
+    const modal = document.getElementById(`qv-modal-${blockId}`);
+    if (modal) modal.classList.remove('is-open');
+  }
+
+  (function() {
+    document.addEventListener('DOMContentLoaded', function() {
+      injectQuickViewTriggers();
+    });
+
+    function injectQuickViewTriggers() {
+      // Find all product links on the collection page
+      const productLinks = document.querySelectorAll('a[href*="/products/"]');
+      
+      productLinks.forEach(link => {
+        // Ensure we don't inject multiple buttons on the same card wrapper
+        if (link.querySelector('.qv-injected-trigger-btn') || link.style.position === 'relative') return;
+        
+        // Find product handle from URL (e.g. /products/blue-widget)
+        const urlParts = link.href.split('/products/');
+        if (urlParts.length < 2) return;
+        const handle = urlParts[1].split('?')[0];
+
+        // Make the parent card relative for correct button positioning
+        link.style.position = 'relative';
+
+        const triggerBtn = document.createElement('button');
+        triggerBtn.type = 'button';
+        triggerBtn.className = 'qv-injected-trigger-btn';
+        triggerBtn.textContent = '{{ block.settings.button_label | default: "Quick View" | escape }}';
+        
+        triggerBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          openQuickViewModal(handle);
+        });
+
+        link.appendChild(triggerBtn);
+      });
+    }
+
+    function openQuickViewModal(handle) {
+      const modal = document.getElementById('qv-modal-{{ block.id }}');
+      const titleEl = document.getElementById('qv-title-{{ block.id }}');
+      const priceEl = document.getElementById('qv-price-{{ block.id }}');
+      const descEl = document.getElementById('qv-desc-{{ block.id }}');
+      const imgEl = document.getElementById('qv-img-{{ block.id }}');
+      const optionsContainer = document.getElementById('qv-options-{{ block.id }}');
+      const submitBtn = document.getElementById('qv-btn-{{ block.id }}');
+
+      if (!modal) return;
+
+      modal.classList.add('is-open');
+
+      // Fetch dynamic product JSON from Shopify APIs
+      fetch(`/products/${handle}.js`)
+        .then(res => res.json())
+        .then(prod => {
+          titleEl.textContent = prod.title;
+          priceEl.textContent = formatQVMoney(prod.price);
+          
+          // Strip HTML tags for clean text descriptions
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = prod.description;
+          descEl.textContent = tempDiv.textContent || tempDiv.innerText || 'No description available.';
+
+          imgEl.src = prod.featured_image ? prod.featured_image : 'https://cdn.shopify.com/s/images/admin/no-image-large.gif';
+
+          // Build variant selectors
+          if (prod.variants && prod.variants.length > 1) {
+            let selectHtml = `<select class="qv-variant-select" id="qv-variant-select-{{ block.id }}">`;
+            prod.variants.forEach(variant => {
+              selectHtml += `
+                <option value="${variant.id}" data-price="${formatQVMoney(variant.price)}">
+                  ${variant.title} - ${formatQVMoney(variant.price)}
+                </option>
+              `;
+            });
+            selectHtml += `</select>`;
+            optionsContainer.innerHTML = selectHtml;
+
+            // Bind change listener to update prices dynamically
+            const sel = document.getElementById('qv-variant-select-{{ block.id }}');
+            sel.addEventListener('change', function() {
+              const selectedOption = sel.options[sel.selectedIndex];
+              priceEl.textContent = selectedOption.dataset.price;
+            });
+          } else {
+            optionsContainer.innerHTML = `<input type="hidden" id="qv-variant-select-{{ block.id }}" value="${prod.variants[0].id}">`;
+          }
+
+          // Bind cart submission
+          submitBtn.onclick = function() {
+            const selectEl = document.getElementById('qv-variant-select-{{ block.id }}');
+            const variantId = selectEl.value;
+
+            submitBtn.disabled = true;
+            submitBtn.querySelector('.qv-btn-label').textContent = 'Adding...';
+
+            fetch('/cart/add.js', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ items: [{ id: variantId, quantity: 1 }] })
+            })
+            .then(res => res.json())
+            .then(() => {
+              submitBtn.querySelector('.qv-btn-label').textContent = 'Added!';
+              document.dispatchEvent(new Event('cart:updated', { bubbles: true }));
+              
+              setTimeout(() => {
+                submitBtn.querySelector('.qv-btn-label').textContent = 'Add to Cart';
+                submitBtn.disabled = false;
+                modal.classList.remove('is-open');
+              }, 1200);
+            })
+            .catch(err => {
+              console.error('Error adding to cart', err);
+              submitBtn.disabled = false;
+            });
+          };
+        })
+        .catch(err => {
+          console.error('Error loading product details', err);
+          descEl.textContent = 'Failed to load product details.';
+        });
+    }
+
+    function formatQVMoney(cents) {
+      const amount = (cents / 100.0).toFixed(2);
+      const shopCurrencySymbol = '{{ cart.currency.symbol }}' || '$';
+      return `${shopCurrencySymbol}${amount}`;
+    }
+  })();
+</script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Quick View Pop-up",
+  "target": "body",
+  "settings": [
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button Hover Text",
+      "default": "Quick View"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Button Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Button Text Color",
+      "default": "#000000"
+    }
+  ]
+}
+{% endschema %}

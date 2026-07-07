@@ -1,0 +1,230 @@
+{% comment %}
+  Collapsible FAQ Accordion (App Block version)
+  Creates collapsible detail tabs for common pre-sales questions.
+  Can be placed anywhere on the product details template.
+{% endcomment %}
+
+<div class="faq-accordion-container-block" id="faq-{{ block.id }}">
+  {% if block.settings.title != blank %}
+    <h4 class="faq-accordion-title">{{ block.settings.title | escape }}</h4>
+  {% endif %}
+
+  <!-- Row 1 -->
+  {% if block.settings.title_1 != blank %}
+    <div class="faq-row">
+      <button type="button" class="faq-header-btn" onclick="toggleFaqRow(this)">
+        <span>{{ block.settings.title_1 | escape }}</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="faq-chevron">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+      <div class="faq-content-pane">
+        <div class="faq-content-inner">
+          <p>{{ block.settings.content_1 | escape | newline_to_br }}</p>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Row 2 -->
+  {% if block.settings.title_2 != blank %}
+    <div class="faq-row">
+      <button type="button" class="faq-header-btn" onclick="toggleFaqRow(this)">
+        <span>{{ block.settings.title_2 | escape }}</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="faq-chevron">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+      <div class="faq-content-pane">
+        <div class="faq-content-inner">
+          <p>{{ block.settings.content_2 | escape | newline_to_br }}</p>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Row 3 -->
+  {% if block.settings.title_3 != blank %}
+    <div class="faq-row">
+      <button type="button" class="faq-header-btn" onclick="toggleFaqRow(this)">
+        <span>{{ block.settings.title_3 | escape }}</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="faq-chevron">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+      <div class="faq-content-pane">
+        <div class="faq-content-inner">
+          <p>{{ block.settings.content_3 | escape | newline_to_br }}</p>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+<style>
+  .faq-accordion-container-block {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 1.5rem 0;
+    box-sizing: border-box;
+    font-family: inherit;
+  }
+
+  .faq-accordion-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: rgba(var(--color-foreground), 0.9);
+    margin: 0 0 0.75rem 0;
+  }
+
+  .faq-row {
+    border-bottom: 1px solid rgba(var(--color-foreground), 0.08);
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .faq-row:first-of-type {
+    border-top: 1px solid rgba(var(--color-foreground), 0.08);
+  }
+
+  .faq-header-btn {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 0.85rem 0.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(var(--color-foreground), 0.8);
+    transition: color 0.2s ease;
+  }
+  .faq-header-btn:hover {
+    color: #10b981;
+  }
+
+  .faq-chevron {
+    width: 16px;
+    height: 16px;
+    color: rgba(var(--color-foreground), 0.4);
+    transition: transform 0.3s ease;
+  }
+
+  /* Expand Collapse transition */
+  .faq-content-pane {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .faq-content-inner {
+    padding: 0 0.25rem 0.85rem 0.25rem;
+    font-size: 0.8rem;
+    color: rgba(var(--color-foreground), 0.6);
+    line-height: 1.5;
+  }
+  .faq-content-inner p {
+    margin: 0;
+  }
+
+  /* Open classes */
+  .faq-row.is-open .faq-chevron {
+    transform: rotate(180deg);
+  }
+</style>
+
+<script>
+  function toggleFaqRow(button) {
+    const row = button.parentNode;
+    const pane = row.querySelector('.faq-content-pane');
+    const isOpen = row.classList.contains('is-open');
+
+    // Close all other rows for accordion style
+    const container = row.parentNode;
+    const allRows = container.querySelectorAll('.faq-row');
+    allRows.forEach(r => {
+      if (r !== row) {
+        r.classList.remove('is-open');
+        r.querySelector('.faq-content-pane').style.maxHeight = null;
+      }
+    });
+
+    if (isOpen) {
+      row.classList.remove('is-open');
+      pane.style.maxHeight = null;
+    } else {
+      row.classList.add('is-open');
+      // Set height dynamically based on content scrollHeight
+      pane.style.maxHeight = pane.scrollHeight + "px";
+    }
+  }
+</script>
+
+{% schema %}
+{
+  "name": "FAQ Collapsible Accordion",
+  "target": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Accordion Heading (Optional)",
+      "default": "Frequently Asked Questions"
+    },
+    {
+      "type": "header",
+      "content": "Panel 1"
+    },
+    {
+      "type": "text",
+      "id": "title_1",
+      "label": "Panel 1 Title",
+      "default": "Shipping & Delivery"
+    },
+    {
+      "type": "textarea",
+      "id": "content_1",
+      "label": "Panel 1 Content",
+      "default": "We ship orders within 1-2 business days. Delivery takes 3-5 business days depending on location."
+    },
+    {
+      "type": "header",
+      "content": "Panel 2"
+    },
+    {
+      "type": "text",
+      "id": "title_2",
+      "label": "Panel 2 Title",
+      "default": "Returns & Exchanges"
+    },
+    {
+      "type": "textarea",
+      "id": "content_2",
+      "label": "Panel 2 Content",
+      "default": "We offer a 30-day money-back guarantee. Return shipping is free."
+    },
+    {
+      "type": "header",
+      "content": "Panel 3"
+    },
+    {
+      "type": "text",
+      "id": "title_3",
+      "label": "Panel 3 Title",
+      "default": "Product Specs & Care"
+    },
+    {
+      "type": "textarea",
+      "id": "content_3",
+      "label": "Panel 3 Content",
+      "default": "Wash in cold water with like colors. Tumble dry on low heat."
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ Collapsible Accordion"
+    }
+  ]
+}
+{% endschema %}
