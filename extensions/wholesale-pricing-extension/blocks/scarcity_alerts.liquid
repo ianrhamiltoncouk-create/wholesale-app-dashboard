@@ -1,0 +1,247 @@
+{% comment %}
+  Stock Scarcity & Viewers Counter Alert (App Block version)
+  Creates urgency using real stock levels and randomized social proof view counts.
+  Can be placed anywhere on the product page layout.
+{% endcomment %}
+
+<div class="scarcity-alerts-container-block" id="scarcity-{{ block.id }}">
+  {% if block.settings.show_stock_scarcity %}
+    {% assign current_variant = product.selected_or_first_available_variant %}
+    {% if current_variant.inventory_management == 'shopify' %}
+      {% if current_variant.inventory_quantity > 0 and current_variant.inventory_quantity <= block.settings.scarcity_threshold %}
+        <div class="scarcity-row scarcity-stock" id="stock-row-{{ block.id }}" data-threshold="{{ block.settings.scarcity_threshold }}">
+          <span class="pulse-fire-icon">🔥</span>
+          <span class="scarcity-text" id="stock-text-{{ block.id }}">
+            {{ block.settings.scarcity_text | replace: '[stock]', current_variant.inventory_quantity | escape }}
+          </span>
+        </div>
+      {% endif %}
+    {% endif %}
+  {% endif %}
+
+  {% if block.settings.show_viewers %}
+    <div class="scarcity-row scarcity-viewers" id="viewers-row-{{ block.id }}">
+      <span class="pulse-eye-icon">👀</span>
+      <span class="scarcity-text" id="viewers-text-{{ block.id }}">
+        Calculating active viewers...
+      </span>
+    </div>
+  {% endif %}
+</div>
+
+<style>
+  .scarcity-alerts-container-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin: 1rem 0;
+    width: 100%;
+    font-family: inherit;
+    box-sizing: border-box;
+  }
+
+  .scarcity-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 0.85rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-sizing: border-box;
+    width: 100%;
+    animation: wsFadeIn 0.3s ease;
+  }
+
+  .scarcity-stock {
+    background: rgba(239, 68, 68, 0.05);
+    border: 1px solid rgba(239, 68, 68, 0.12);
+    color: #b91c1c;
+  }
+  
+  .scarcity-viewers {
+    background: rgba(59, 130, 246, 0.05);
+    border: 1px solid rgba(59, 130, 246, 0.12);
+    color: #1d4ed8;
+  }
+
+  .pulse-fire-icon, .pulse-eye-icon {
+    font-size: 1.1rem;
+    display: inline-block;
+  }
+  .scarcity-stock .pulse-fire-icon {
+    animation: firePulse 1.5s infinite alternate;
+  }
+  .scarcity-viewers .pulse-eye-icon {
+    animation: eyeWink 3.5s infinite;
+  }
+
+  @keyframes firePulse {
+    0% { transform: scale(1); filter: drop-shadow(0 0 1px rgba(239,68,68,0.2)); }
+    100% { transform: scale(1.15); filter: drop-shadow(0 0 4px rgba(239,68,68,0.4)); }
+  }
+
+  @keyframes eyeWink {
+    0%, 90%, 100% { transform: scaleY(1); }
+    95% { transform: scaleY(0.1); }
+  }
+
+  @keyframes wsFadeIn {
+    from { opacity: 0; transform: translateY(3px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<script>
+  (function() {
+    document.addEventListener('DOMContentLoaded', function() {
+      initScarcityAlerts();
+    });
+
+    function initScarcityAlerts() {
+      const container = document.getElementById('scarcity-{{ block.id }}');
+      if (!container) return;
+
+      // 1. Social proof viewer logic
+      const viewersTextEl = document.getElementById('viewers-text-{{ block.id }}');
+      if (viewersTextEl) {
+        const min = parseInt('{{ block.settings.min_visitors | default: 5 }}', 10);
+        const max = parseInt('{{ block.settings.max_visitors | default: 20 }}', 10);
+        const textTemplate = '{{ block.settings.viewers_text | default: "[count] people are viewing this product right now." }}';
+
+        function updateVisitorCount() {
+          const count = Math.floor(Math.random() * (max - min + 1)) + min;
+          viewersTextEl.innerHTML = textTemplate.replace('[count]', `<strong>${count}</strong>`);
+        }
+
+        updateVisitorCount();
+        // Shift count slightly every 8-15 seconds for realism
+        setInterval(updateVisitorCount, Math.floor(Math.random() * 7000) + 8000);
+      }
+
+      // 2. Synchronize variant selection with inventory checks
+      const variantInputSelectors = [
+        'select[name="id"]',
+        'input[name="id"]',
+        '[name="id"]',
+        'variant-selects select',
+        'variant-radios input[type="radio"]:checked'
+      ];
+
+      // Fetch the product JSON data to map variants to their inventory levels
+      const productJson = {{ product | json }};
+      
+      function updateVariantInventory() {
+        let activeVariantId = null;
+        for (let selector of variantInputSelectors) {
+          const el = document.querySelector(selector);
+          if (el) {
+            activeVariantId = el.value;
+            break;
+          }
+        }
+        
+        if (!activeVariantId && productJson.variants && productJson.variants.length > 0) {
+          activeVariantId = productJson.variants[0].id;
+        }
+
+        if (!activeVariantId) return;
+
+        const variant = productJson.variants.find(v => v.id.toString() === activeVariantId.toString());
+        const stockRow = document.getElementById('stock-row-{{ block.id }}');
+        const stockText = document.getElementById('stock-text-{{ block.id }}');
+
+        if (variant && stockRow && stockText) {
+          const threshold = parseInt(stockRow.dataset.threshold, 10);
+          
+          // Note: In public client-side JSON, inventory_quantity is sometimes hidden by Shopify settings.
+          // Fallback: If inventory is tracked but quantity isn't in JSON, we hide it or show fallback
+          const qty = variant.inventory_quantity;
+          
+          if (qty !== undefined && qty > 0 && qty <= threshold) {
+            stockRow.style.display = 'flex';
+            const scarcityTextTemplate = '{{ block.settings.scarcity_text | default: "Only [stock] items left in stock - order soon!" }}';
+            stockText.innerHTML = scarcityTextTemplate.replace('[stock]', `<strong>${qty}</strong>`);
+          } else {
+            stockRow.style.display = 'none';
+          }
+        }
+      }
+
+      const variantSelects = document.querySelectorAll(variantInputSelectors.join(','));
+      variantSelects.forEach(select => {
+        select.addEventListener('change', updateVariantInventory);
+      });
+
+      document.addEventListener('change', function(e) {
+        if (e.target.matches('variant-selects select') || e.target.matches('variant-radios input')) {
+          setTimeout(updateVariantInventory, 50);
+        }
+      });
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Urgency & Scarcity Alerts",
+  "target": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Low Stock Scarcity"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_stock_scarcity",
+      "label": "Show Low Stock Warning",
+      "default": true
+    },
+    {
+      "type": "number",
+      "id": "scarcity_threshold",
+      "label": "Inventory Alert Threshold",
+      "default": 10
+    },
+    {
+      "type": "text",
+      "id": "scarcity_text",
+      "label": "Stock Scarcity Text",
+      "default": "Only [stock] items left in stock - order soon!"
+    },
+    {
+      "type": "header",
+      "content": "Social Proof Viewers"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_viewers",
+      "label": "Show Viewer Count Warning",
+      "default": true
+    },
+    {
+      "type": "number",
+      "id": "min_visitors",
+      "label": "Minimum Viewers Range",
+      "default": 5
+    },
+    {
+      "type": "number",
+      "id": "max_visitors",
+      "label": "Maximum Viewers Range",
+      "default": 20
+    },
+    {
+      "type": "text",
+      "id": "viewers_text",
+      "label": "Viewer Warning Text",
+      "default": "[count] people are viewing this product right now."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Urgency & Scarcity Alerts"
+    }
+  ]
+}
+{% endschema %}

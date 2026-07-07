@@ -1,0 +1,189 @@
+{% comment %}
+  Guaranteed Safe & Secure Checkout Trust Badges (App Block version)
+  Displays payment icons and trust messages to increase brand authority.
+  Can be placed anywhere on the product details template.
+{% endcomment %}
+
+<div class="trust-badges-container-block" id="trust-{{ block.id }}">
+  <h5 class="trust-heading">{{ block.settings.heading | default: "Guaranteed Safe & Secure Checkout" | escape }}</h5>
+  
+  <div class="trust-logos-row">
+    {% if block.settings.show_visa %}
+      <div class="payment-badge-icon" title="Visa">
+        <!-- Visa SVG -->
+        <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" role="img" class="p-svg"><title>Visa</title><path d="M12 24H8.4L12 0h3.6L12 24zm22.4 0h-3.2l-3-15.6c-.4-1.8-1.5-2.4-3-2.4H20v3.6h3.2c.6 0 1 .3 1.1.9l2.7 13.5h3.6l5.3-20h3.6L34.4 24zM6 0L0 15v1.2C0 17 1 18 2.2 18h6.6L11 24h3.6L9.6 0H6zm4.8 14.4H4.8l1.2-6h3.6l1.2 6z" fill="currentColor"/></svg>
+      </div>
+    {% endif %}
+
+    {% if block.settings.show_mastercard %}
+      <div class="payment-badge-icon" title="Mastercard">
+        <!-- Mastercard SVG -->
+        <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" role="img" class="p-svg"><title>Mastercard</title><circle cx="15" cy="12" r="10" fill="#EB001B" opacity="0.9"/><circle cx="23" cy="12" r="10" fill="#F79E1B" opacity="0.9"/></svg>
+      </div>
+    {% endif %}
+
+    {% if block.settings.show_paypal %}
+      <div class="payment-badge-icon" title="PayPal">
+        <!-- PayPal SVG -->
+        <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" role="img" class="p-svg"><title>PayPal</title><path d="M11 2h10c4.4 0 8 3.6 8 8s-3.6 8-8 8H13l-1.5 6H8l4.5-18c.2-.8 1-.8 1.5-6h-3z" fill="#003087"/><path d="M15 6h9c3.9 0 7 3.1 7 7s-3.1 7-7 7H17l-1.5 6H12l4.5-18c.2-.8 1-.8 1.5-6h-3z" fill="#0079C1"/></svg>
+      </div>
+    {% endif %}
+
+    {% if block.settings.show_applepay %}
+      <div class="payment-badge-icon" title="Apple Pay">
+        <!-- Apple Pay SVG -->
+        <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" role="img" class="p-svg"><title>Apple Pay</title><path d="M15 15h2.5c2 0 3.5-1.5 3.5-3.5S19.5 8 17.5 8H15v7zm0-11h2c1.7 0 3 1.3 3 3s-1.3 3-3 3h-2V4zm-7.6 9.8c0-.7.4-1.1 1.1-1.1s1.1.4 1.1 1.1c0 .7-.4 1.1-1.1 1.1s-1.1-.4-1.1-1.1zm2.3-5.2C8.6 7.6 8 7 8 5.9c0-1 .6-1.7 1.7-1.7s1.7.6 1.7 1.7c0 1.1-.6 1.7-1.7 1.7zm18.3 6.4h-1.5l-.3-1c-.5.8-1.3 1.2-2.3 1.2-1.7 0-3-1.3-3-3s1.3-3 3-3c1 0 1.8.4 2.3 1.2v-3.7h1.8v8.3zm-3-1.5c.8 0 1.5-.6 1.5-1.5s-.7-1.5-1.5-1.5-1.5.6-1.5 1.5.7 1.5 1.5 1.5z" fill="currentColor"/></svg>
+      </div>
+    {% endif %}
+
+    {% if block.settings.show_googlepay %}
+      <div class="payment-badge-icon" title="Google Pay">
+        <!-- Google Pay SVG -->
+        <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" role="img" class="p-svg"><title>Google Pay</title><path d="M9 13.5v-7h2.8c1.3 0 2.2.9 2.2 2.1s-.9 2.1-2.2 2.1H10.5v2.8H9zm1.5-4.2h1.3c.5 0 .8-.3.8-.7s-.3-.7-.8-.7h-1.3v1.4zm10.3 4.2h-1.6l-.3-1c-.4.8-1.2 1.2-2.2 1.2-1.6 0-2.8-1.3-2.8-3s1.2-3 2.8-3c1 0 1.8.4 2.2 1.2v-3.7H21v8.3zm-3-1.5c.8 0 1.4-.6 1.4-1.5s-.6-1.5-1.4-1.5-1.4.6-1.4 1.5.6 1.5 1.4 1.5zm6 1.5l-2.8-6.2H23l1.8 4.2 1.8-4.2h1.6l-2.8 6.2h-1.6z" fill="currentColor"/></svg>
+      </div>
+    {% endif %}
+
+    {% if block.settings.show_amex %}
+      <div class="payment-badge-icon" title="American Express">
+        <!-- Amex SVG -->
+        <svg viewBox="0 0 38 24" xmlns="http://www.w3.org/2000/svg" role="img" class="p-svg"><title>American Express</title><rect width="38" height="24" rx="4" fill="#0070d2"/><path d="M5 6h12v12H5V6zm14 0h14v12H19V6z" fill="none" stroke="#fff" stroke-width="2"/></svg>
+      </div>
+    {% endif %}
+  </div>
+
+  {% if block.settings.sub_message != blank %}
+    <p class="trust-sub-message">{{ block.settings.sub_message | escape }}</p>
+  {% endif %}
+</div>
+
+<style>
+  .trust-badges-container-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    margin: 1.5rem 0;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: inherit;
+    text-align: center;
+  }
+
+  .trust-heading {
+    font-size: 0.775rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(var(--color-foreground), 0.55);
+    margin: 0;
+  }
+
+  .trust-logos-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+  }
+
+  .payment-badge-icon {
+    width: 38px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(var(--color-foreground), 0.6);
+    border: 1px solid rgba(var(--color-foreground), 0.08);
+    border-radius: 4px;
+    padding: 0.2rem;
+    background: transparent;
+    transition: all 0.25s ease;
+  }
+  .payment-badge-icon:hover {
+    color: rgba(var(--color-foreground), 0.9);
+    border-color: rgba(var(--color-foreground), 0.2);
+    transform: translateY(-1px);
+  }
+
+  .p-svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .trust-sub-message {
+    font-size: 0.725rem;
+    color: rgba(var(--color-foreground), 0.45);
+    margin: 0;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Checkout Trust Badges",
+  "target": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading Text",
+      "default": "Guaranteed Safe & Secure Checkout"
+    },
+    {
+      "type": "header",
+      "content": "Toggle Logos"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_visa",
+      "label": "Show Visa",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_mastercard",
+      "label": "Show Mastercard",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_paypal",
+      "label": "Show PayPal",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_applepay",
+      "label": "Show Apple Pay",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_googlepay",
+      "label": "Show Google Pay",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_amex",
+      "label": "Show American Express",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Footer Note"
+    },
+    {
+      "type": "text",
+      "id": "sub_message",
+      "label": "Secondary message (Optional)",
+      "default": "🔒 Encrypted SSL connection. We do not store credit card details."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Checkout Trust Badges"
+    }
+  ]
+}
+{% endschema %}

@@ -14,7 +14,7 @@
       padding: 2rem;
     }
     .dashboard-container {
-      max-width: 950px;
+      max-width: 980px;
       margin: 0 auto;
     }
     .header-card {
@@ -48,8 +48,8 @@
       line-height: 1.5;
     }
     
-    /* Tabs styling */
-    .tabs-container {
+    /* Category Tabs styling */
+    .category-tabs {
       display: flex;
       border-bottom: 1px solid #e1e3e5;
       margin-bottom: 1.5rem;
@@ -83,6 +83,77 @@
       border-radius: 99px;
     }
 
+    /* Widget Selection Grid */
+    .widget-selector-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #1a1c1d;
+      margin-bottom: 0.75rem;
+    }
+    .widgets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .widget-card {
+      background: white;
+      border-radius: 10px;
+      padding: 1.25rem;
+      border: 1px solid #e1e3e5;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+      transition: all 0.2s ease;
+    }
+    .widget-card:hover {
+      border-color: #008060;
+      transform: translateY(-1px);
+    }
+    .widget-card.active {
+      border-color: #008060;
+      background: rgba(0, 128, 96, 0.01);
+      box-shadow: 0 0 0 2px #008060;
+    }
+    .widget-icon-wrapper {
+      background: #f1f2f4;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      transition: all 0.2s ease;
+    }
+    .widget-card.active .widget-icon-wrapper {
+      background: #e2f1e8;
+    }
+    .widget-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .widget-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #1a1c1d;
+      margin: 0;
+    }
+    .widget-status {
+      font-size: 0.725rem;
+      color: #6d7175;
+      margin-top: 0.15rem;
+    }
+
+    /* Steps Layout */
+    .step-section-header {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #1a1c1d;
+      margin-bottom: 0.75rem;
+    }
     .grid-setup {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -92,7 +163,7 @@
     .step-card {
       background: white;
       border-radius: 10px;
-      padding: 1.5rem;
+      padding: 1.25rem;
       border: 1px solid #e1e3e5;
       display: flex;
       flex-direction: column;
@@ -128,14 +199,14 @@
       background: #008060;
       color: white;
     }
-    .step-title {
-      font-size: 1rem;
+    .step-card-title {
+      font-size: 0.95rem;
       font-weight: 700;
       margin: 0 0 0.5rem 0;
       color: #1a1c1d;
     }
     .step-desc {
-      font-size: 0.85rem;
+      font-size: 0.825rem;
       color: #6d7175;
       line-height: 1.4;
       margin-bottom: 1rem;
@@ -147,7 +218,7 @@
       border: none;
       padding: 0.65rem 1.25rem;
       border-radius: 6px;
-      font-size: 0.85rem;
+      font-size: 0.825rem;
       font-weight: 600;
       cursor: pointer;
       text-align: center;
@@ -235,19 +306,32 @@
     <div class="header-card">
       <span class="badge">App Control Center</span>
       <h1 class="main-title">Storefront Utility Suite</h1>
-      <p class="subtitle">Welcome to your app dashboard! Select a utility tab below to configure settings, view integration guides, and open direct links.</p>
+      <p class="subtitle">Welcome to your app suite dashboard! Select a category below to configure and enable your active merchant utilities.</p>
     </div>
 
-    <!-- Widgets Tab Bar -->
-    <div class="tabs-container">
-      <button class="tab-button active" id="tab-wholesale" onclick="switchWidgetTab('wholesale')">🏷️ Wholesale Tiers</button>
-      <button class="tab-button" id="tab-recovery" onclick="switchWidgetTab('recovery')">🛒 Cart Recovery</button>
-      <button class="tab-button" id="tab-uploader" onclick="switchWidgetTab('uploader')">📁 Custom File Uploader</button>
+    <!-- Category Tabs -->
+    <div class="category-tabs">
+      <button class="tab-button active" id="tab-b2b" onclick="switchCategory('b2b')">🏷️ B2B & Wholesale Tiers</button>
+      <button class="tab-button" id="tab-cart" onclick="switchCategory('cart')">🛒 Cart & Checkout Boosters</button>
+      <button class="tab-button" id="tab-conversion" onclick="switchCategory('conversion')">🎨 Conversion & Urgency Tools</button>
     </div>
+
+    <!-- Widget Selector Title -->
+    <h3 class="widget-selector-title">Select Utility Widget:</h3>
+
+    <!-- Active Category Widgets Grid -->
+    <div class="widgets-grid" id="widgetsGrid">
+      <!-- Widgets will load dynamically -->
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #e1e3e5; margin: 1.5rem 0 2rem 0;">
+
+    <!-- Onboarding Setup Title -->
+    <h3 class="step-section-header" id="stepSectionHeader">Widget Setup Steps:</h3>
 
     <!-- Active Step Cards Panel -->
     <div class="grid-setup" id="stepsGrid">
-      <!-- Grid items loaded dynamically -->
+      <!-- Steps load dynamically -->
     </div>
 
     <!-- Dynamic Instruction Panel -->
@@ -273,274 +357,324 @@
     const discountsUrl = shop ? `https://admin.shopify.com/store/${shopId}/discounts` : 'https://admin.shopify.com/store/discounts';
     const ordersUrl = shop ? `https://admin.shopify.com/store/${shopId}/orders` : 'https://admin.shopify.com/store/orders';
 
-    // Current State
-    let activeTab = 'wholesale';
+    // App state
+    let activeCategory = 'b2b';
+    let activeWidget = 'wholesale';
     let activeStep = 1;
 
-    // 1. Wholesale Tiers Data
-    const wholesaleSteps = [
-      {
-        title: "Open Editor",
-        desc: "Open the Theme Editor to enable the widgets globally.",
-        btnHtml: `<a href="${customizerUrl}" class="btn-polaris" target="_top">Open Editor</a>`
+    // Database of Widgets and Steps
+    const widgetDatabase = {
+      // B2B CATEGORY
+      wholesale: {
+        title: "Wholesale pricing",
+        icon: "🏷️",
+        steps: [
+          { title: "Open Editor", desc: "Open the Theme Editor to enable widgets.", btnHtml: `<a href="${customizerUrl}" class="btn-polaris" target="_top">Open Editor</a>` },
+          { title: "Configure Tiers", desc: "Set up bulk quantities & discount values.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(2)">Show pricing guide</button>` },
+          { title: "Create Discounts", desc: "Map discount codes to match values.", btnHtml: `<a href="${discountsUrl}" class="btn-polaris btn-secondary" target="_top">Create Discounts</a>` },
+          { title: "Approve Users", desc: "Tag customers with 'wholesale' to unlock.", btnHtml: `<a href="${customersUrl}" class="btn-polaris btn-secondary" target="_top">Approve Users</a>` }
+        ],
+        guides: {
+          1: {
+            title: "Step 1: Open Theme Customizer & Toggle App Embeds",
+            why: { badge: "Why do this?", title: "Activate the Widget Engine", desc: "Shopify uses App Embeds to inject app features securely. Turning this toggle on allows our widgets to load automatically on your product and cart pages." },
+            how: { badge: "How to do it?", title: "5-Second Setup", desc: "1. Click the green <strong>Open Editor</strong> button in Step 1.<br>2. At the top-left of the Theme Customizer window, click the <strong>4th icon</strong> (the shapes icon) to open the <strong>App embeds</strong> menu.<br>3. Switch the toggles to **ON** for <strong>Wholesale Auto-Pricing</strong>.<br>4. Click **Save** in the top right." }
+          },
+          2: {
+            title: "Step 2: Configure Wholesale Pricing Tiers",
+            why: { badge: "Why do this?", title: "Specify Bulk Quantities & Discount Rates", desc: "To make wholesale buying appealing, you must define your pricing tiers. This step tells the storefront widget exactly what volume levels correspond to what discount rates." },
+            how: { badge: "How to do it?", title: "Setting Your Tiers", desc: "1. Inside the Theme Customizer, click directly on the text <strong>\"Wholesale Auto-Pricing\"</strong> in the left sidebar.<br>2. A settings panel will open on the <strong>right-hand side of your screen</strong>.<br>3. Look for the **Wholesale Tiers (Qty:Discount%)** input box.<br>4. Type your tiers in the format `MinQty:Discount%` separated by commas. For example: `5:10, 10:15, 20:20` means buying 5+ items gets 10% off, 10+ items gets 15% off, and 20+ items gets 20% off.<br>5. Click **Save** in the top right." },
+            underHood: { badge: "Under the Hood", title: "Automated Discount Mapping", desc: "Our app automatically maps these tiers to discount codes named `BULK[Qty]`. For example, setting a tier for quantity <strong>5</strong> tells our app to apply a Shopify discount code named <strong>BULK5</strong> at checkout. Proceed to Step 3 to register these codes!" }
+          },
+          3: {
+            title: "Step 3: Create Matching Discount Codes in Shopify",
+            why: { badge: "Why do this?", title: "Authorize the Price Reductions at Checkout", desc: "Our storefront widget beautifully calculates and displays bulk prices, and automatically applies the discount cookie in the customer's browser. However, **Shopify's checkout security will reject the discount unless you have registered the code in your Shopify Admin.**" },
+            how: { badge: "How to do it?", title: "Creating the codes", desc: "1. Click the <strong>Create Discounts</strong> button in Step 3.<br>2. Click <strong>Create discount</strong> ➔ select <strong>Amount off products</strong>.<br>3. Choose <strong>Discount code</strong> and name it exactly <strong>BULK5</strong> (matching your Tier 1).<br>4. Under *Discount value*, enter <code>10%</code>.<br>5. Under *Minimum purchase requirements*, select <strong>Minimum quantity of items</strong> and enter <code>5</code>.<br>6. Under *Customer eligibility*, select *Specific customer segments* or customer tags to lock it to wholesale customers.<br>7. Click **Save**." }
+          },
+          4: {
+            title: "Step 4: Approve Wholesale Customer Accounts",
+            why: { badge: "Why do this?", title: "Protect Your Profit Margins", desc: "You don't want regular retail customers seeing your wholesale prices. By requiring a specific tag (e.g. `wholesale`), customers can register accounts normally, but they **cannot** see bulk pricing until you manually approve them." },
+            how: { badge: "How to do it?", title: "Approving Accounts", desc: "1. Click the <strong>Approve Users</strong> button in Step 4.<br>2. Select the customer profile you want to approve.<br>3. In their profile card on the right, find the **Tags** input field.<br>4. Type in <code>wholesale</code> and press Enter.<br>5. Click **Save**." }
+          }
+        }
       },
-      {
-        title: "Configure Tiers",
-        desc: "Set up your bulk tiers (quantity and discount percentages).",
-        btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(2)">Show pricing guide</button>`
-      },
-      {
-        title: "Create Discounts",
-        desc: "Map discount codes so they apply at checkout.",
-        btnHtml: `<a href="${discountsUrl}" class="btn-polaris btn-secondary" target="_top">Create Discounts</a>`
-      },
-      {
-        title: "Approve Accounts",
-        desc: "Add tags to profiles to grant wholesale pricing.",
-        btnHtml: `<a href="${customersUrl}" class="btn-polaris btn-secondary" target="_top">Approve Users</a>`
-      }
-    ];
 
-    const wholesaleGuides = {
-      1: {
-        title: "Step 1: Open Theme Customizer & Toggle App Embeds",
-        why: {
-          badge: "Why do this?",
-          title: "Activate the Widget Engine",
-          desc: "Shopify uses <strong>App Embeds</strong> to inject app features securely without modifying your theme files. Turning this toggle on allows our widgets to load automatically on your product and cart pages."
-        },
-        how: {
-          badge: "How to do it?",
-          title: "5-Second Setup",
-          desc: "1. Click the green <strong>Open Editor</strong> button in Step 1.<br>2. At the top-left of the Theme Customizer window, click the <strong>4th icon</strong> (the shapes icon) to open the <strong>App embeds</strong> menu.<br>3. Switch the toggles to **ON** for both <strong>Wholesale Auto-Pricing</strong> and <strong>Cart Auto-Recovery</strong>.<br>4. Click **Save** in the top right."
+      // CART CATEGORY
+      cart_recovery: {
+        title: "Cart Recovery",
+        icon: "🛒",
+        steps: [
+          { title: "Enable Recovery", desc: "Open the Theme Editor and turn the Cart Auto-Recovery toggle ON.", btnHtml: `<a href="${customizerUrl}" class="btn-polaris" target="_top">Open Editor</a>` },
+          { title: "Choose Method", desc: "Configure manual emails (Free) or automated API Webhooks.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(2)">Show automation guide</button>` },
+          { title: "Test Exit Intent", desc: "Simulate a leaving customer on your storefront to test.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(3)">Show testing steps</button>` }
+        ],
+        guides: {
+          1: {
+            title: "Step 1: Open Theme Customizer & Toggle Cart Auto-Recovery",
+            why: { badge: "Why do this?", title: "Monitor Cart States & Catch Leaving Visitors", desc: "Activating the recovery script enables the exit-intent detector globally and dynamically places the 'Request Quote' button directly beneath the checkout button on your Cart page without modifying code." },
+            how: { badge: "How to do it?", title: "Enable App Embed", desc: "1. Click the green <strong>Open Editor</strong> button in Step 1.<br>2. At the top-left of the Theme Customizer window, click the <strong>4th icon</strong> (the shapes icon) to open the <strong>App embeds</strong> sidebar.<br>3. Toggle **Cart Auto-Recovery** to **ON**.<br>4. Click **Save** in the top right." }
+          },
+          2: {
+            title: "Step 2: Choose Recovery Flow (Manual Emails vs. Auto Webhooks)",
+            why: { badge: "Why do this?", title: "Decide How Quote Requests Are Processed", desc: "When a customer requests an invoice, you need a way to receive and process it. You can review and process these requests manually via email for free, or set up a webhook to automate creating draft invoices." },
+            how: { badge: "Your Two Options", title: "Manual (Free) or Webhook (Automated)", desc: "<strong>Option A: Free/Manual Flow (No Setup Required):</strong><br>Leave the Webhook URL setting blank inside the customizer. When a customer submits a quote, our widget automatically sends an email to you containing their name, company, email, and a structured text list of their items.<br><br><strong>Option B: Webhook Automation (Zapier / Make.com):</strong><br>1. Create a webhook in Zapier or Make.com.<br>2. Enter the webhook URL inside the **Webhook URL** field in the Theme Customizer settings of your Cart Auto-Recovery block.<br>3. Set your webhook flow to receive our JSON payload." }
+          },
+          3: {
+            title: "Step 3: Test Exit Intent and Cart Buttons on Storefront",
+            why: { badge: "Why do this?", title: "Validate the Customer Experience", desc: "Testing ensures that both the direct checkout page button and the exit-intent popup behave perfectly before your storefront visitors use them." },
+            how: { badge: "How to test", title: "Simulate Cart Abandonment", desc: "1. Open a new window and visit your storefront.<br>2. Add any product to your cart.<br>3. **Test Cart Page Button:** Go to <code>/cart</code>. You should see a secondary button labeled <strong>\"Email Me My Cart Link\"</strong>. Click it to open the form.<br>4. **Test Exit-Intent:** Navigate to any page with items in your cart. Move your mouse cursor rapidly to the top of the browser tab. A beautiful popup modal will slide open prompting you to save your items!" }
+          }
         }
       },
-      2: {
-        title: "Step 2: Configure Wholesale Pricing Tiers",
-        why: {
-          badge: "Why do this?",
-          title: "Specify Bulk Quantities & Discount Rates",
-          desc: "To make wholesale buying appealing, you must define your pricing tiers. This step tells the storefront widget exactly what volume levels (e.g., 5 items) correspond to what discount rates (e.g., 10% off) so it can display them to logged-in wholesalers."
-        },
-        how: {
-          badge: "How to do it?",
-          title: "Setting Your Tiers",
-          desc: "1. Inside the Theme Customizer (after turning App Embeds ON in Step 1), click directly on the text <strong>\"Wholesale Auto-Pricing\"</strong> in the left sidebar.<br>2. A settings panel will open on the <strong>right-hand side of your screen</strong>.<br>3. Look for the **Wholesale Tiers (Qty:Discount%)** input box.<br>4. Type your tiers in the format `MinQty:Discount%` separated by commas. For example: `5:10, 10:15, 20:20` means buying 5+ items gets 10% off, 10+ items gets 15% off, and 20+ items gets 20% off.<br>5. Click **Save** in the top right."
-        },
-        underHood: {
-          badge: "Under the Hood",
-          title: "Automated Discount Mapping",
-          desc: "Our app automatically maps these tiers to discount codes named `BULK[Qty]`. For example, setting a tier for quantity <strong>5</strong> tells our app to apply a Shopify discount code named <strong>BULK5</strong> at checkout. Proceed to Step 3 to register these codes!"
+      shipping_tracker: {
+        title: "Free Shipping Tracker",
+        icon: "🚚",
+        steps: [
+          { title: "Enable Tracker", desc: "Open the Theme Editor and turn the Free Shipping Progress toggle ON.", btnHtml: `<a href="${customizerUrl}" class="btn-polaris" target="_top">Open Editor</a>` },
+          { title: "Set Goal Limit", desc: "Define your free shipping target amount (e.g. $75) and text.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(2)">Show settings guide</button>` },
+          { title: "Test Goal Bar", desc: "Add products to your cart and watch the tracker fill up live.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(3)">Show testing flow</button>` }
+        ],
+        guides: {
+          1: {
+            title: "Step 1: Open Theme Customizer & Enable Free Shipping Progress Bar",
+            why: { badge: "Why do this?", title: "Incentivize Customers to Add More Items", desc: "By reminding customers that they are close to unlocking free shipping, you increase their likelihood of adding more items to their cart, boosting your store's average order value." },
+            how: { badge: "How to do it?", title: "Enable App Embed", desc: "1. Click the green <strong>Open Editor</strong> button in Step 1.<br>2. Go to the <strong>App embeds</strong> sidebar (4th icon at the top-left).<br>3. Toggle ON **Free Shipping Progress**.<br>4. Click **Save** in the top right." }
+          },
+          2: {
+            title: "Step 2: Configure Your Free Shipping Goal Limit & Wording",
+            why: { badge: "Why do this?", title: "Tailor the Value & Message to Your Margins", desc: "Specify the exact dollar threshold required to get free shipping. Customize the messages so they match your store's tone of voice." },
+            how: { badge: "How to do it?", title: "Customize Settings", desc: "1. Inside App Embeds sidebar, click directly on the words <strong>\"Free Shipping Progress\"</strong>.<br>2. On the right settings panel, configure:<br>- **Shipping Goal Amount:** Enter your goal limit (e.g. <code>75</code> for $75).<br>- **Goal Progress Message:** The text shown while adding items. Use <code>[amount]</code> where you want the remaining cash amount to render.<br>- **Goal Reached Message:** The success text shown when they qualify.<br>- **Bar Position:** Choose *Sticky Top Header* or a *Floating Bottom Card*.<br>3. Click **Save**." }
+          },
+          3: {
+            title: "Step 3: Test Dynamic Cart Syncing on Your Storefront",
+            why: { badge: "Why do this?", title: "Ensure the Progress Bar Updates in Real-Time", desc: "Testing validates that when items are added or quantities change, the progress bar fills up instantly without requiring the customer to reload the page." },
+            how: { badge: "How to test", title: "Verify Cart Sync", desc: "1. Go to your storefront and add a low-cost item to your cart.<br>2. **Result:** The progress bar will slide in showing exactly how much more you need to spend.<br>3. Add another item ➔ **Result:** The green bar will dynamically fill up, and the remaining amount will decrease. once you hit the goal, it will show your congratulations message!" }
+          }
         }
       },
-      3: {
-        title: "Step 3: Create Matching Discount Codes in Shopify",
-        why: {
-          badge: "Why do this?",
-          title: "Authorize the Price Reductions at Checkout",
-          desc: "Our storefront widget beautifully calculates and displays bulk prices, and automatically applies the discount cookie in the customer's browser. However, **Shopify's checkout security will reject the discount unless you have registered the code in your Shopify Admin.**"
-        },
-        how: {
-          badge: "How to do it?",
-          title: "Creating the codes",
-          desc: `1. Click the <strong>Create Discounts</strong> button in Step 3.<br>
-          2. Click <strong>Create discount</strong> ➔ select <strong>Amount off products</strong>.<br>
-          3. Choose <strong>Discount code</strong> and name it exactly <strong>BULK5</strong> (matching your Tier 1).<br>
-          4. Under *Discount value*, enter <code>10%</code>.<br>
-          5. Under *Minimum purchase requirements*, select <strong>Minimum quantity of items</strong> and enter <code>5</code>.<br>
-          6. Under *Customer eligibility*, select *Specific customer segments* or customer tags to lock it to wholesale customers.<br>
-          7. Click <strong>Save</strong>. Repeat these steps to create <strong>BULK10</strong> (minimum quantity 10, value 15%).`
+      sticky_cart: {
+        title: "Sticky Add to Cart",
+        icon: "📌",
+        steps: [
+          { title: "Enable Sticky Bar", desc: "Open the Theme Editor and turn the Sticky Add to Cart Bar toggle ON.", btnHtml: `<a href="${customizerUrl}" class="btn-polaris" target="_top">Open Editor</a>` },
+          { title: "Customize Buttons", desc: "Choose color parameters, select dropdowns, and position settings.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(2)">Show settings guide</button>` },
+          { title: "Test Scroll Trigger", desc: "Scroll down a product page and verify the buy bar slides in.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(3)">Show scroll test</button>` }
+        ],
+        guides: {
+          1: {
+            title: "Step 1: Open Theme Customizer & Toggle Sticky Add to Cart Bar",
+            why: { badge: "Why do this?", title: "Increase Accessibility & Conversion Rates", desc: "As shoppers scroll down long pages to read descriptions or reviews, they lose sight of the buy button. The Sticky Cart Bar keeps the buy button visible at all times, making checking out instant." },
+            how: { badge: "How to do it?", title: "Enable App Embed", desc: "1. Click the green <strong>Open Editor</strong> button in Step 1.<br>2. Go to the <strong>App embeds</strong> sidebar (4th icon).<br>3. Toggle ON **Sticky Add to Cart Bar**.<br>4. Click **Save**." }
+          },
+          2: {
+            title: "Step 2: Configure Button Colors and Positioning",
+            why: { badge: "Why do this?", title: "Match Your Brand Colors & Layout Rules", desc: "Customize the colors of the sticky buy button to match your brand style, and choose whether it floats at the top or bottom of the screen." },
+            how: { badge: "How to do it?", title: "Configure Settings", desc: "1. Inside App embeds sidebar, click directly on the words <strong>\"Sticky Add to Cart Bar\"</strong>.<br>2. In the right settings panel, configure:<br>- **Enable on Mobile/Desktop:** Choose where the bar renders.<br>- **Position:** Select *Top of Screen* or *Bottom of Screen*.<br>- **Button Colors:** Set the background and text color of the button.<br>3. Click **Save**." }
+          },
+          3: {
+            title: "Step 3: Test Scroll Activation on Your Storefront",
+            why: { badge: "Why do this?", title: "Ensure the Bar Slides in Smoothly", desc: "Testing ensures the bar remains hidden initially, and only appears once the customer has scrolled past the main buy button." },
+            how: { badge: "How to test", title: "Scroll Test", desc: "1. Go to any product page on your storefront.<br>2. Scroll down past the product price and the main Add to Cart form.<br>3. **Result:** The sticky bar will slide onto your screen smoothly, showing the product image, title, variant dropdown, and buy button. Try selecting a variant and clicking Add to Cart!" }
+          }
         }
       },
-      4: {
-        title: "Step 4: Approve Wholesale Customer Accounts",
-        why: {
-          badge: "Why do this?",
-          title: "Protect Your Profit Margins",
-          desc: "You don't want regular retail customers seeing your wholesale prices. By requiring a specific tag (e.g. `wholesale`), customers can register accounts normally, but they **cannot** see bulk pricing until you manually approve them."
-        },
-        how: {
-          badge: "How to do it?",
-          title: "Approving Accounts",
-          desc: `1. Click the <strong>Approve Users</strong> button in Step 4.<br>
-          2. Select the customer profile you want to approve.<br>
-          3. In their profile card on the right, find the **Tags** input field.<br>
-          4. Type in <code>wholesale</code> (or your custom tag) and press Enter.<br>
-          5. Click **Save**.<br>
-          6. The next time that customer logs in, the wholesale pricing grid and cart recovery options will immediately unlock for them!`
-        }
-      }
-    };
 
-    // 2. Cart Recovery Data
-    const recoverySteps = [
-      {
-        title: "Enable Recovery",
-        desc: "Open the Theme Editor and turn the Cart Auto-Recovery toggle ON.",
-        btnHtml: `<a href="${customizerUrl}" class="btn-polaris" target="_top">Open Editor</a>`
-      },
-      {
-        title: "Choose Method",
-        desc: "Configure manual emails (Free) or automated API Webhooks.",
-        btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(2)">Show automation guide</button>`
-      },
-      {
-        title: "Test Exit Intent",
-        desc: "Simulate a leaving customer on your storefront to test.",
-        btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(3)">Show testing steps</button>`
-      }
-    ];
-
-    const recoveryGuides = {
-      1: {
-        title: "Step 1: Open Theme Customizer & Toggle Cart Auto-Recovery",
-        why: {
-          badge: "Why do this?",
-          title: "Monitor Cart States & Catch Leaving Visitors",
-          desc: "Activating the recovery script enables the exit-intent detector globally and dynamically places the 'Request Quote' button directly beneath the checkout button on your Cart page without modifying code."
-        },
-        how: {
-          badge: "How to do it?",
-          title: "Enable App Embed",
-          desc: "1. Click the green <strong>Open Editor</strong> button in Step 1.<br>2. At the top-left of the Theme Customizer window, click the <strong>4th icon</strong> (the shapes icon) to open the <strong>App embeds</strong> sidebar.<br>3. Toggle **Cart Auto-Recovery** to **ON**.<br>4. Click **Save** in the top right."
+      // CONVERSION CATEGORY
+      file_uploader: {
+        title: "Custom File Uploader",
+        icon: "📁",
+        steps: [
+          { title: "Enable Uploader", desc: "Open the Theme Editor and turn the Custom File Uploader toggle ON.", btnHtml: `<a href="${customizerUrl}" class="btn-polaris" target="_top">Open Editor</a>` },
+          { title: "Configure Fields", desc: "Set allowed extensions, custom labels, and required flags.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(2)">Show settings guide</button>` },
+          { title: "Receive Files", desc: "Open your Orders list to view custom files sent by clients.", btnHtml: `<a href="${ordersUrl}" class="btn-polaris btn-secondary" target="_top">Open Orders</a>` }
+        ],
+        guides: {
+          1: {
+            title: "Step 1: Open Theme Customizer & Toggle Custom File Uploader",
+            why: { badge: "Why do this?", title: "Inject Drag & Drop Uploader on Product Pages", desc: "Activating the Custom File Uploader App Embed auto-injects a modern, drag-and-drop file upload box directly above your product page forms. Customers can upload designs, t-shirt artwork, or drawings directly with their purchase." },
+            how: { badge: "How to do it?", title: "Enable App Embed", desc: "1. Click the green <strong>Open Editor</strong> button in Step 1.<br>2. Go to the <strong>App embeds</strong> sidebar (4th icon at the top-left).<br>3. Toggle **Custom File Uploader** to **ON**.<br>4. Click **Save** in the top right." }
+          },
+          2: {
+            title: "Step 2: Customize Uploader Labels & Requirements",
+            why: { badge: "Why do this?", title: "Adapt the Uploader to Your Specific Products", desc: "You can change labels to fit your business type (e.g. 'Upload Engraving Logo' or 'Upload Drawing'). You can also enforce validation, like blocking the 'Add to Cart' button unless they upload a file." },
+            how: { badge: "How to do it?", title: "Edit Settings Sidebar", desc: `1. Click the <strong>Open Editor</strong> button in Step 1.<br>
+            2. Under the App embeds list, click directly on the words <strong>"Custom File Uploader"</strong>.<br>
+            3. On the right-hand side of your screen, edit:
+               * **Upload Box Label:** Change the heading text above the uploader.<br>
+               * **Allowed File Types:** Enter file extensions like <code>png, jpg, pdf</code>.<br>
+               * **File Upload Required:** Check this box to force customers to upload an image before they can add to cart.<br>
+               * **Show Instruction Textarea:** Enable a text input so customers can type custom instructions (e.g. text for engravings).<br>
+            4. Click **Save** in the top-right corner.` }
+          },
+          3: {
+            title: "Step 3: Download Custom Files from Shopify Orders",
+            why: { badge: "Why do this?", title: "Process Custom Work Orders Efficiently", desc: "Because we integrate directly with Shopify's product attributes, you do not need an external server or file storage host. Shopify securely uploads, hosts, and stores the customer's design, linking it directly to the customer's order file." },
+            how: { badge: "How to process", title: "Downloading Custom Files", desc: `1. Click the <strong>Open Orders</strong> button in Step 3.<br>
+            2. Click on the customer order you want to process.<br>
+            3. Look in the order details under the product line item. You will see a clickable text hyperlink showing the file name (e.g. <code>custom-logo.png</code>).<br>
+            4. **Click the link** to download the high-resolution image directly onto your computer for printing or production!<br>
+            5. If they added instructions (like engraving texts), it will also be listed right beside the download link.` }
+          }
         }
       },
-      2: {
-        title: "Step 2: Choose Recovery Flow (Manual Emails vs. Auto Webhooks)",
-        why: {
-          badge: "Why do this?",
-          title: "Decide How Quote Requests Are Processed",
-          desc: "When a customer requests an invoice, you need a way to receive and process it. You can review and process these requests manually via email for free, or set up a webhook to automate creating draft invoices."
-        },
-        how: {
-          badge: "Your Two Options",
-          title: "Manual (Free) or Webhook (Automated)",
-          desc: `<strong>Option A: Free/Manual Flow (No Setup Required):</strong><br>
-          Leave the <strong>Webhook URL</strong> setting blank inside the customizer. When a customer submits a quote, our widget automatically sends an email to you containing their name, company, email, and a structured text list of their items (including quantities and variant IDs). You can then manually create a Draft Order in your Shopify Admin.<br><br>
-          
-          <strong>Option B: Webhook Automation (Zapier / Make.com):</strong><br>
-          1. Create a webhook in Zapier or Make.com.<br>
-          2. Enter the webhook URL inside the **Webhook URL** field in the Theme Customizer settings of your Cart Auto-Recovery block.<br>
-          3. Set your webhook flow to receive our JSON payload (which includes Customer Email, Company, Notes, and a clean list of variant IDs + quantities) and trigger Shopify's <strong>Create Draft Order</strong> and <strong>Send Invoice</strong> API endpoints.`
+      scarcity_alerts: {
+        title: "Urgency Alerts",
+        icon: "🔥",
+        steps: [
+          { title: "Open Editor", desc: "Open the Theme Editor and navigate to your Product page template.", btnHtml: `<a href="${customizerUrl}" class="btn-polaris" target="_top">Open Editor</a>` },
+          { title: "Place Block", desc: "Drag and drop the Scarcity Alerts block where you want it on the page.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(2)">Show placement guide</button>` },
+          { title: "Define Threshold", desc: "Configure stock levels and view counts to trigger alerts.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(3)">Show settings guide</button>` }
+        ],
+        guides: {
+          1: {
+            title: "Step 1: Open Theme Customizer & Navigate to Product Template",
+            why: { badge: "Why do this?", title: "Target the Product Page Layout", desc: "Unlike App Embeds (which float site-wide), the Stock Scarcity widget is a standard **App Block**. This means you can choose its exact visual location inside your product details layout." },
+            how: { badge: "How to do it?", title: "Open Product Layout", desc: "1. Click the green <strong>Open Editor</strong> button in Step 1.<br>2. In the top-center dropdown menu, select **Products** ➔ **Default product**.<br>3. This will load your store's product template in the editor screen." }
+          },
+          2: {
+            title: "Step 2: Drag and Drop the Scarcity Alerts Block",
+            why: { badge: "Why do this?", title: "Achieve the Perfect Visual Placement", desc: "You want your urgency alerts to be highly visible but not intrusive. Placing them right below your product price or above your Add to Cart button is the highest-converting placement." },
+            how: { badge: "How to do it?", title: "Injecting the block", desc: "1. In the left sidebar of the customizer, look for the **Product Information** section list.<br>2. Click **Add block** at the bottom of that list.<br>3. Scroll down and select **Urgency & Scarcity Alerts** under *Apps*.<br>4. Hover over the block, grab the six-dot grid handle, and drag it up or down to place it exactly where you want it (e.g. right below the price)." }
+          },
+          3: {
+            title: "Step 3: Configure Stock Alert Thresholds & Visitor Counter Ranges",
+            why: { badge: "Why do this?", title: "Establish Urgency Parameters", desc: "Define when the stock warning shows (so it only alerts visitors when stock is actually low) and customize the social proof visitor counter ranges." },
+            how: { badge: "How to do it?", title: "Configure Settings", desc: "1. Click directly on the **Urgency & Scarcity Alerts** block in your left sidebar layout.<br>2. In the settings panel on the right, configure:<br>- **Inventory Alert Threshold:** Set the quantity limit (e.g. <code>10</code> items) below which the alert triggers.<br>- **Stock Scarcity Text:** Customize the alert text. Use <code>[stock]</code> where you want the live inventory count to appear.<br>- **Show Visitor Count:** Toggle the viewer counter.<br>- **Minimum / Maximum Viewers:** Define the random range for viewers (e.g. 5 to 20).<br>3. Click **Save** in the top right." }
+          }
         }
       },
-      3: {
-        title: "Step 3: Test Exit Intent and Cart Buttons on Storefront",
-        why: {
-          badge: "Why do this?",
-          title: "Validate the Customer Experience",
-          desc: "Testing ensures that both the direct checkout page button and the exit-intent popup behave perfectly before your storefront visitors use them."
-        },
-        how: {
-          badge: "How to test",
-          title: "Simulate Cart Abandonment",
-          desc: `1. Open a new window and visit your storefront.<br>
-          2. Add any product to your cart.<br>
-          3. **Test Cart Page Button:** Go to <code>/cart</code>. You should see a secondary button labeled <strong>"Email Me My Cart Link"</strong> automatically placed below your checkout button. Click it to open the form.<br>
-          4. **Test Exit-Intent:** Navigate to any page with items in your cart. Move your mouse cursor rapidly to the top of the browser tab (simulating closing the tab). A beautiful popup modal will slide open prompting you to save your items!`
-        }
-      }
-    };
-
-    // 3. Custom File Uploader Data
-    const uploaderSteps = [
-      {
-        title: "Enable Uploader",
-        desc: "Open the Theme Editor and turn the File Uploader toggle ON.",
-        btnHtml: `<a href="${customizerUrl}" class="btn-polaris" target="_top">Open Editor</a>`
-      },
-      {
-        title: "Configure Fields",
-        desc: "Set allowed extensions, custom labels, and required flags.",
-        btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(2)">Show settings guide</button>`
-      },
-      {
-        title: "Receive Files",
-        desc: "Open your Orders list to view custom files sent by clients.",
-        btnHtml: `<a href="${ordersUrl}" class="btn-polaris btn-secondary" target="_top">Open Orders</a>`
-      }
-    ];
-
-    const uploaderGuides = {
-      1: {
-        title: "Step 1: Open Theme Customizer & Toggle Custom File Uploader",
-        why: {
-          badge: "Why do this?",
-          title: "Inject Drag & Drop Uploader on Product Pages",
-          desc: "Activating the Custom File Uploader App Embed auto-injects a modern, drag-and-drop file upload box directly above your product page forms. Customers can upload designs, t-shirt artwork, or drawings directly with their purchase."
-        },
-        how: {
-          badge: "How to do it?",
-          title: "Enable App Embed",
-          desc: "1. Click the green <strong>Open Editor</strong> button in Step 1.<br>2. At the top-left of the Theme Customizer window, click the <strong>4th icon</strong> (the shapes icon) to open the <strong>App embeds</strong> sidebar.<br>3. Toggle **Custom File Uploader** to **ON**.<br>4. Click **Save** in the top right."
+      trust_badges: {
+        title: "Trust Badges",
+        icon: "🔒",
+        steps: [
+          { title: "Open Editor", desc: "Open the Theme Editor and navigate to your Product page template.", btnHtml: `<a href="${customizerUrl}" class="btn-polaris" target="_top">Open Editor</a>` },
+          { title: "Place Badges", desc: "Drag and drop the Checkout Trust Badges block below your buy form.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(2)">Show placement guide</button>` },
+          { title: "Toggle Badges", desc: "Select which payment method SVGs to show to customers.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(3)">Show toggling guide</button>` }
+        ],
+        guides: {
+          1: {
+            title: "Step 1: Open Theme Customizer & Navigate to Product Template",
+            why: { badge: "Why do this?", title: "Target the Product Page Layout", desc: "The Checkout Trust Badges widget is an App Block, meaning you can place it exactly where you want it. Renders beautiful secure checkout payment icons right beneath your Buy Now button." },
+            how: { badge: "How to do it?", title: "Open Product Layout", desc: "1. Click the green <strong>Open Editor</strong> button in Step 1.<br>2. In the top-center dropdown menu, select **Products** ➔ **Default product**." }
+          },
+          2: {
+            title: "Step 2: Drag and Drop the Checkout Trust Badges Block",
+            why: { badge: "Why do this?", title: "Inject Trust Directly Below the Purchase Decisions", desc: "Placing secure checkout guarantees directly beneath the 'Add to Cart' or 'Buy It Now' buttons is a proven layout to reduce hesitation and cart abandonment." },
+            how: { badge: "How to do it?", title: "Injecting the block", desc: "1. In the left sidebar of the customizer under the **Product Information** section list, click **Add block**.<br>2. Select **Checkout Trust Badges**.<br>3. Drag it up or down to place it directly beneath the product form / buy buttons.<br>4. Click **Save**." }
+          },
+          3: {
+            title: "Step 3: Toggle Supported Payment Icons & Edit Messages",
+            why: { badge: "Why do this?", title: "Match Your Accepted Checkout Options", desc: "Merchants want to display only the payment networks they actually support. You can toggle icons on or off (Visa, MasterCard, PayPal, Apple Pay, etc.) and write a custom trust subtitle." },
+            how: { badge: "How to do it?", title: "Configure Settings", desc: "1. Click on the **Checkout Trust Badges** block in your left sidebar layout.<br>2. In the settings panel on the right, edit:<br>- **Heading Text:** Set the trust title (e.g. *Guaranteed Safe & Secure Checkout*).<br>- **Toggles:** Check the boxes next to the logos you want to display (Visa, Mastercard, Paypal, Apple Pay, Google Pay, Amex).<br>- **Secondary Message:** Customize the lock/SSL text at the bottom.<br>3. Click **Save** in the top right." }
+          }
         }
       },
-      2: {
-        title: "Step 2: Customize Uploader Labels & Requirements",
-        why: {
-          badge: "Why do this?",
-          title: "Adapt the Uploader to Your Specific Products",
-          desc: "You can change labels to fit your business type (e.g. 'Upload Engraving Logo' or 'Upload Drawing'). You can also enforce validation, like blocking the 'Add to Cart' button unless they upload a file."
-        },
-        how: {
-          badge: "How to do it?",
-          title: "Edit Settings Sidebar",
-          desc: `1. Click the <strong>Open Editor</strong> button in Step 1.<br>
-          2. Under the App embeds list, click directly on the words <strong>"Custom File Uploader"</strong>.<br>
-          3. On the right-hand side of your screen, edit:
-             * **Upload Box Label:** Change the heading text above the uploader.<br>
-             * **Allowed File Types:** Enter file extensions like <code>png, jpg, pdf</code>.<br>
-             * **File Upload Required:** Check this box to force customers to upload an image before they can add to cart.<br>
-             * **Show Instruction Textarea:** Enable a text input so customers can type custom instructions (e.g. text for engravings).<br>
-          4. Click **Save** in the top-right corner.`
-        }
-      },
-      3: {
-        title: "Step 3: Download Custom Files from Shopify Orders",
-        why: {
-          badge: "Why do this?",
-          title: "Process Custom Work Orders Efficiently",
-          desc: "Because we integrate directly with Shopify's product attributes, you do not need an external server or file storage host. Shopify securely uploads, hosts, and stores the customer's design, linking it directly to the customer's order file."
-        },
-        how: {
-          badge: "How to process",
-          title: "Downloading Custom Files",
-          desc: `1. Click the <strong>Open Orders</strong> button in Step 3.<br>
-          2. Click on the customer order you want to process.<br>
-          3. Look in the order details under the product line item. You will see a clickable text hyperlink showing the file name (e.g. <code>custom-logo.png</code>).<br>
-          4. **Click the link** to download the high-resolution image directly onto your computer for printing or production!<br>
-          5. If they added instructions (like engraving texts), it will also be listed right beside the download link.`
+      flash_timer: {
+        title: "Flash Sale Timer",
+        icon: "⏱️",
+        steps: [
+          { title: "Open Editor", desc: "Open the Theme Editor and navigate to your Product page template.", btnHtml: `<a href="${customizerUrl}" class="btn-polaris" target="_top">Open Editor</a>` },
+          { title: "Place Timer", desc: "Drag and drop the Flash Sale Timer block onto the page layout.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(2)">Show placement guide</button>` },
+          { title: "Set Expiry Date", desc: "Set the targeted end date and time to start the live countdown.", btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(3)">Show date guide</button>` }
+        ],
+        guides: {
+          1: {
+            title: "Step 1: Open Theme Customizer & Navigate to Product Template",
+            why: { badge: "Why do this?", title: "Target the Product Page Layout", desc: "The Flash Sale Timer is an App Block. This lets you place the countdown timer exactly where you need it (e.g. right above the product title, or below the price card) to create visual urgency." },
+            how: { badge: "How to do it?", title: "Open Product Layout", desc: "1. Click the green <strong>Open Editor</strong> button in Step 1.<br>2. In the top-center dropdown menu, select **Products** ➔ **Default product**." }
+          },
+          2: {
+            title: "Step 2: Drag and Drop the Flash Sale Timer Block",
+            why: { badge: "Why do this?", title: "Position the Urgency Cue in High-Impact Zones", desc: "Placing a countdown timer right below the product price card creates maximum visual impact, showing the shopper that they will miss out on the discount if they wait." },
+            how: { badge: "How to do it?", title: "Injecting the block", desc: "1. In the left sidebar of the customizer under the **Product Information** section list, click **Add block**.<br>2. Select **Flash Sale Timer**.<br>3. Drag it up or down to place it directly beneath the product price card.<br>4. Click **Save**." }
+          },
+          3: {
+            title: "Step 3: Set Your Expiry Date and Customize Expiry Messages",
+            why: { badge: "Why do this?", title: "Initiate the Live Countdown Timer", desc: "Set the target date and time when the sale officially ends. The widget will calculate the exact remaining days, hours, minutes, and seconds and count down in real-time." },
+            how: { badge: "How to do it?", title: "Configure Settings", desc: "1. Click on the **Flash Sale Timer** block in your left sidebar layout.<br>2. In the settings panel on the right, configure:<br>- **Timer Heading:** Set the text above the timer (e.g., *Limited Time Offer! Sale Ends In:*).<br>- **End Date:** Type the end date in standard `YYYY-MM-DD` format (e.g. <code>2026-12-31</code>) or ISO format (e.g. <code>2026-12-31T23:59:59</code>). Make sure the format matches exactly!<br>- **Expired Alert Text:** The text that shows once the timer hits zero (e.g. *Offer has ended!*).<br>3. Click **Save** in the top right." }
+          }
         }
       }
     };
 
-    function switchWidgetTab(tabName) {
-      activeTab = tabName;
+    // Category mappings
+    const categoryWidgets = {
+      b2b: ['wholesale'],
+      cart: ['cart_recovery', 'shipping_tracker', 'sticky_cart'],
+      conversion: ['file_uploader', 'scarcity_alerts', 'trust_badges', 'flash_timer']
+    };
+
+    function switchCategory(catName) {
+      activeCategory = catName;
+      // Default to the first widget in the newly selected category
+      activeWidget = categoryWidgets[catName][0];
       activeStep = 1;
+
+      // Toggle tab buttons visual active state
+      document.getElementById('tab-b2b').classList.toggle('active', catName === 'b2b');
+      document.getElementById('tab-cart').classList.toggle('active', catName === 'cart');
+      document.getElementById('tab-conversion').classList.toggle('active', catName === 'conversion');
+
+      renderWidgetsGrid();
+      renderStepCards();
+      selectStep(1);
+    }
+
+    function renderWidgetsGrid() {
+      const grid = document.getElementById('widgetsGrid');
+      const widgetIds = categoryWidgets[activeCategory];
       
-      // Update Tab Button styles
-      document.getElementById('tab-wholesale').classList.toggle('active', tabName === 'wholesale');
-      document.getElementById('tab-recovery').classList.toggle('active', tabName === 'recovery');
-      document.getElementById('tab-uploader').classList.toggle('active', tabName === 'uploader');
-      
+      let html = '';
+      widgetIds.forEach(id => {
+        const widget = widgetDatabase[id];
+        const isActive = id === activeWidget;
+        html += `
+          <div class="widget-card ${isActive ? 'active' : ''}" onclick="selectWidget('${id}')" id="widget-card-${id}">
+            <div class="widget-icon-wrapper">${widget.icon}</div>
+            <div class="widget-info">
+              <h4 class="widget-title">${widget.title}</h4>
+              <span class="widget-status">${isActive ? 'Active Guide' : 'Click to setup'}</span>
+            </div>
+          </div>
+        `;
+      });
+      grid.innerHTML = html;
+    }
+
+    function selectWidget(widgetId) {
+      activeWidget = widgetId;
+      activeStep = 1;
+
+      // Update widget card active styles
+      const widgetIds = categoryWidgets[activeCategory];
+      widgetIds.forEach(id => {
+        const card = document.getElementById(`widget-card-${id}`);
+        if (card) {
+          card.classList.toggle('active', id === widgetId);
+          const statusText = card.querySelector('.widget-status');
+          if (statusText) statusText.textContent = id === widgetId ? 'Active Guide' : 'Click to setup';
+        }
+      });
+
       renderStepCards();
       selectStep(1);
     }
 
     function renderStepCards() {
       const grid = document.getElementById('stepsGrid');
-      let steps = [];
-      if (activeTab === 'wholesale') steps = wholesaleSteps;
-      else if (activeTab === 'recovery') steps = recoverySteps;
-      else if (activeTab === 'uploader') steps = uploaderSteps;
+      const widget = widgetDatabase[activeWidget];
+      const steps = widget.steps;
       
+      // Update Setup Header with the widget title
+      document.getElementById('stepSectionHeader').textContent = `${widget.title} Setup Steps:`;
+
       let html = '';
       steps.forEach((step, index) => {
         const stepNum = index + 1;
         html += `
           <div class="step-card ${stepNum === activeStep ? 'active' : ''}" onclick="selectStep(${stepNum})" id="step-${stepNum}-card">
             <div class="step-num">${stepNum}</div>
-            <h3 class="step-title">${step.title}</h3>
+            <h3 class="step-card-title">${step.title}</h3>
             <p class="step-desc">${step.desc}</p>
             <div onclick="event.stopPropagation();">${step.btnHtml}</div>
           </div>
@@ -553,12 +687,10 @@
     function selectStep(stepNum) {
       activeStep = stepNum;
       
-      // Toggle active classes on cards
-      let stepsCount = 0;
-      if (activeTab === 'wholesale') stepsCount = wholesaleSteps.length;
-      else if (activeTab === 'recovery') stepsCount = recoverySteps.length;
-      else if (activeTab === 'uploader') stepsCount = uploaderSteps.length;
+      const widget = widgetDatabase[activeWidget];
+      const stepsCount = widget.steps.length;
 
+      // Toggle active classes on cards
       for (let i = 1; i <= stepsCount; i++) {
         const card = document.getElementById(`step-${i}-card`);
         if (card) {
@@ -568,10 +700,7 @@
 
       // Update instructions panel content
       const panel = document.getElementById('instructionPanel');
-      let data = null;
-      if (activeTab === 'wholesale') data = wholesaleGuides[stepNum];
-      else if (activeTab === 'recovery') data = recoveryGuides[stepNum];
-      else if (activeTab === 'uploader') data = uploaderGuides[stepNum];
+      const data = widget.guides[stepNum];
       
       let html = `
         <h3 class="guide-title">
@@ -600,7 +729,7 @@
     }
 
     // Initial Load
-    switchWidgetTab('wholesale');
+    switchCategory('b2b');
   </script>
 </body>
 </html>

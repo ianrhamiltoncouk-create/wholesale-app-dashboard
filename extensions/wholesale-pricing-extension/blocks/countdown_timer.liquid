@@ -1,0 +1,219 @@
+{% comment %}
+  Flash Sale Countdown Timer (App Block version)
+  Creates urgency on sales products by displaying a real-time countdown timer.
+  Can be placed anywhere on the page layout.
+{% endcomment %}
+
+<div class="countdown-timer-container-block" id="timer-{{ block.id }}" style="display: none;">
+  {% if block.settings.title != blank %}
+    <h4 class="timer-title">{{ block.settings.title | escape }}</h4>
+  {% endif %}
+
+  <div class="timer-display-row">
+    <!-- Days -->
+    <div class="timer-segment">
+      <span class="timer-num" id="days-{{ block.id }}">00</span>
+      <span class="timer-label">Days</span>
+    </div>
+    <span class="timer-colon">:</span>
+
+    <!-- Hours -->
+    <div class="timer-segment">
+      <span class="timer-num" id="hours-{{ block.id }}">00</span>
+      <span class="timer-label">Hrs</span>
+    </div>
+    <span class="timer-colon">:</span>
+
+    <!-- Minutes -->
+    <div class="timer-segment">
+      <span class="timer-num" id="minutes-{{ block.id }}">00</span>
+      <span class="timer-label">Mins</span>
+    </div>
+    <span class="timer-colon">:</span>
+
+    <!-- Seconds -->
+    <div class="timer-segment">
+      <span class="timer-num" id="seconds-{{ block.id }}">00</span>
+      <span class="timer-label">Secs</span>
+    </div>
+  </div>
+
+  <div class="timer-expired-message" id="expired-{{ block.id }}" style="display: none;">
+    {{ block.settings.expired_text | default: "Sale has ended!" | escape }}
+  </div>
+</div>
+
+<style>
+  .countdown-timer-container-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    background: rgba(var(--color-foreground), 0.02);
+    border: 1px solid rgba(var(--color-foreground), 0.08);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin: 1.5rem 0;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: inherit;
+    text-align: center;
+  }
+
+  .timer-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #ef4444;
+    margin: 0;
+    animation: flashRed 1.5s infinite alternate;
+  }
+
+  @keyframes flashRed {
+    0% { opacity: 0.85; }
+    100% { opacity: 1; color: #b91c1c; }
+  }
+
+  .timer-display-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .timer-segment {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 50px;
+  }
+
+  .timer-num {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: rgba(var(--color-foreground), 0.9);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .timer-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: rgba(var(--color-foreground), 0.5);
+    margin-top: 0.25rem;
+  }
+
+  .timer-colon {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: rgba(var(--color-foreground), 0.3);
+    padding-bottom: 0.85rem;
+  }
+
+  .timer-expired-message {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: rgba(var(--color-foreground), 0.5);
+    font-style: italic;
+  }
+</style>
+
+<script>
+  (function() {
+    document.addEventListener('DOMContentLoaded', function() {
+      initCountdownTimer();
+    });
+
+    function initCountdownTimer() {
+      const container = document.getElementById('timer-{{ block.id }}');
+      const daysEl = document.getElementById('days-{{ block.id }}');
+      const hoursEl = document.getElementById('hours-{{ block.id }}');
+      const minutesEl = document.getElementById('minutes-{{ block.id }}');
+      const secondsEl = document.getElementById('seconds-{{ block.id }}');
+      const expiredEl = document.getElementById('expired-{{ block.id }}');
+      const displayRow = container ? container.querySelector('.timer-display-row') : null;
+
+      if (!container || !daysEl || !hoursEl || !minutesEl || !secondsEl) return;
+
+      // Merchant target date in ISO or simple format: YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS
+      const configDateStr = '{{ block.settings.end_date }}';
+      if (!configDateStr) return;
+
+      const targetDate = new Date(configDateStr).getTime();
+      if (isNaN(targetDate)) {
+        console.warn('Countdown Timer: Invalid end_date format. Please use YYYY-MM-DD format.');
+        return;
+      }
+
+      container.style.display = 'flex';
+
+      function updateCountdown() {
+        const now = new Date().getTime();
+        const difference = targetDate - now;
+
+        if (difference < 0) {
+          // Timer ended
+          if (displayRow) displayRow.style.display = 'none';
+          if (expiredEl) expiredEl.style.display = 'block';
+          clearInterval(timerInterval);
+          return;
+        }
+
+        // Time calculations
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+        // Render values with padded zeros
+        daysEl.textContent = days.toString().padStart(2, '0');
+        hoursEl.textContent = hours.toString().padStart(2, '0');
+        minutesEl.textContent = minutes.toString().padStart(2, '0');
+        secondsEl.textContent = seconds.toString().padStart(2, '0');
+      }
+
+      // Run immediately
+      updateCountdown();
+      
+      // Update every 1 second
+      const timerInterval = setInterval(updateCountdown, 1000);
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Flash Sale Timer",
+  "target": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Timer Heading",
+      "default": "Limited Time Offer! Sale Ends In:"
+    },
+    {
+      "type": "text",
+      "id": "end_date",
+      "label": "End Date (YYYY-MM-DD or ISO Format)",
+      "default": "2026-12-31T23:59:59",
+      "info": "E.g. 2026-12-31T23:59:59 (Be sure to check spelling: YYYY-MM-DD)"
+    },
+    {
+      "type": "text",
+      "id": "expired_text",
+      "label": "Expired Alert Text",
+      "default": "Offer has ended!"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Flash Sale Timer"
+    }
+  ]
+}
+{% endschema %}
