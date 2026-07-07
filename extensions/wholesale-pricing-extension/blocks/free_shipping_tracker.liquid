@@ -39,15 +39,37 @@
       let thresholdSetting = '{{ block.settings.shipping_threshold }}';
       let parsedThreshold = parseFloat(thresholdSetting);
       if (isNaN(parsedThreshold) || parsedThreshold <= 0) {
-        parsedThreshold = 75; // Fallback to 75
+        parsedThreshold = 75;
       }
       const threshold = parsedThreshold * 100; // Convert to cents
       
       const position = '{{ block.settings.position | default: "top_banner" }}';
       container.className = `free-shipping-tracker-container fs-pos-${position}`;
 
+      // Apply background color & auto-contrast text
+      const bgColor = '{{ block.settings.bg_color | default: "#ffffff" }}';
+      container.style.backgroundColor = bgColor;
+      applyTextContrast(bgColor, messageEl);
+
       const barColor = '{{ block.settings.bar_color | default: "#10b981" }}';
       fillEl.style.backgroundColor = barColor;
+
+      function applyTextContrast(hexColor, element) {
+        const hex = hexColor.replace('#', '');
+        if (hex.length === 3) {
+          const r = parseInt(hex[0] + hex[0], 16);
+          const g = parseInt(hex[1] + hex[1], 16);
+          const b = parseInt(hex[2] + hex[2], 16);
+          const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+          element.style.color = (yiq >= 128) ? '#1a1c1d' : '#ffffff';
+        } else if (hex.length === 6) {
+          const r = parseInt(hex.substring(0, 2), 16);
+          const g = parseInt(hex.substring(2, 4), 16);
+          const b = parseInt(hex.substring(4, 6), 16);
+          const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+          element.style.color = (yiq >= 128) ? '#1a1c1d' : '#ffffff';
+        }
+      }
 
       function updateTracker() {
         fetch('/cart.js')
@@ -108,10 +130,8 @@
         return `${shopCurrencySymbol}${amount}`;
       }
 
-      // Initial run
       updateTracker();
 
-      // 1. Intercept Fetch API requests
       const nativeFetch = window.fetch;
       window.fetch = function() {
         return nativeFetch.apply(this, arguments).then(response => {
@@ -124,7 +144,6 @@
         });
       };
 
-      // 2. Intercept XMLHttpRequests (handles jQuery, AJAX drawers, and older themes)
       const nativeOpen = XMLHttpRequest.prototype.open;
       XMLHttpRequest.prototype.open = function(method, url) {
         this.addEventListener('load', function() {
@@ -171,6 +190,12 @@
         { "value": "bottom_floating", "label": "Floating Bottom Card" }
       ],
       "default": "top_banner"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Banner Background Color",
+      "default": "#ffffff"
     },
     {
       "type": "color",
