@@ -17,9 +17,11 @@
 
 <script>
   (function() {
-    document.addEventListener('DOMContentLoaded', function() {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initFreeShippingTracker);
+    } else {
       initFreeShippingTracker();
-    });
+    }
 
     function initFreeShippingTracker() {
       const container = document.getElementById('fs-tracker-{{ block.id }}');
