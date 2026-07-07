@@ -293,9 +293,356 @@
     .guide-badge.how { background: #fff4e5; color: #b25e00; }
     .guide-badge.info { background: #e2f1e8; color: #108043; }
 
+    /* Visual Workspace Split-Pane Layout */
+    .visual-workspace-container {
+      background: white;
+      border-radius: 12px;
+      padding: 2.25rem;
+      border: 1px solid #e1e3e5;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+      margin-bottom: 2rem;
+      animation: fadeIn 0.35s ease-out;
+    }
+    .workspace-split {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 2.5rem;
+      margin-top: 1rem;
+    }
+    @media (max-width: 900px) {
+      .workspace-split {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+    }
+    .builder-pane {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .preview-pane {
+      background: #f6f6f7;
+      border-radius: 10px;
+      padding: 1.5rem;
+      border: 1px dashed #c9cccf;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      position: relative;
+    }
+    .preview-label-tag {
+      position: absolute;
+      top: -0.75rem;
+      left: 1.25rem;
+      background: #202223;
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.2rem 0.60rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    /* Rule Tier Rows */
+    .tier-rules-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin: 0.5rem 0;
+    }
+    .tier-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: #f6f6f7;
+      padding: 0.75rem;
+      border-radius: 6px;
+      border: 1px solid #e1e3e5;
+      animation: fadeIn 0.2s ease-out;
+    }
+    .tier-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #202223;
+      min-width: 44px;
+    }
+    .tier-input-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-grow: 1;
+    }
+    .input-text-polaris {
+      background: white;
+      border: 1px solid #c9cccf;
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.85rem;
+      color: #202223;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+      box-sizing: border-box;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+    .input-text-polaris:focus {
+      border-color: #008060;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.05), 0 0 0 2px rgba(0, 128, 96, 0.15);
+    }
+    .input-qty { width: 65px; text-align: center; }
+    .input-val { width: 100px; }
+    .select-polaris {
+      background: white;
+      border: 1px solid #c9cccf;
+      border-radius: 6px;
+      padding: 0.5rem 1.5rem 0.5rem 0.75rem;
+      font-size: 0.85rem;
+      color: #202223;
+      cursor: pointer;
+      box-sizing: border-box;
+      outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236d7175'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.5rem center;
+      background-size: 1.15rem;
+    }
+    .select-polaris:focus {
+      border-color: #008060;
+    }
+    
+    .btn-delete-tier {
+      background: none;
+      border: none;
+      color: #8c9196;
+      cursor: pointer;
+      padding: 0.4rem;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    .btn-delete-tier:hover {
+      color: #d82c0d;
+      background: #fff0ed;
+    }
+    
+    /* Main output and Action Panel */
+    .output-section {
+      background: #f1f2f4;
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-top: 1rem;
+      border: 1px solid #e1e3e5;
+    }
+    .output-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    .output-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #202223;
+      margin: 0;
+    }
+    .tag-output-box {
+      font-family: monospace;
+      font-size: 0.9rem;
+      background: white;
+      padding: 0.75rem 1rem;
+      border: 1px solid #c9cccf;
+      border-radius: 6px;
+      color: #006fbb;
+      word-break: break-all;
+      user-select: all;
+      margin-bottom: 1rem;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
+    }
+    .pulsing-btn {
+      position: relative;
+      animation: pulseGlow 2s infinite;
+      box-shadow: 0 0 0 0 rgba(0, 128, 96, 0.4);
+    }
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 0 0 rgba(0, 128, 96, 0.5); }
+      70% { box-shadow: 0 0 0 8px rgba(0, 128, 96, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(0, 128, 96, 0); }
+    }
+    
+    .copied-toast {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a1c1d;
+      color: white;
+      padding: 0.65rem 1.5rem;
+      border-radius: 20px;
+      font-size: 0.825rem;
+      font-weight: 600;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      animation: popUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      display: none;
+    }
+    @keyframes popUp {
+      from { opacity: 0; transform: translate(-50%, 10px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+    
+    /* Mockup product card css overrides matching storefront-suite.css styling */
+    .mock-preview-card {
+      width: 100%;
+      background: white;
+      border-radius: 10px;
+      border: 1px solid #e1e3e5;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+      padding: 1.25rem;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .mock-header {
+      border-bottom: 1px solid #f1f2f4;
+      padding-bottom: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .mock-badge {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: inline-block;
+      margin-bottom: 0.35rem;
+      box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+    }
+    .mock-title { font-size: 1rem; font-weight: 700; color: #1a1c1d; margin: 0 0 0.25rem 0; }
+    .mock-subheading { font-size: 0.75rem; color: #6d7175; margin: 0; }
+    
+    .mock-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    @media (max-width: 480px) {
+      .mock-grid { grid-template-columns: 1fr; }
+    }
+    .mock-tier-card {
+      border: 1px solid #e1e3e5;
+      border-radius: 8px;
+      padding: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      position: relative;
+    }
+    .mock-tier-card.active {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.02);
+      box-shadow: 0 0 0 1px #10b981;
+    }
+    .mock-tier-qty { font-size: 0.75rem; font-weight: 700; color: #6d7175; }
+    .mock-tier-card.active .mock-tier-qty { color: #10b981; }
+    .mock-tier-price { font-size: 1.1rem; font-weight: 700; color: #1a1c1d; }
+    .mock-tier-discount { font-size: 0.7rem; font-weight: 600; color: #10b981; }
+    .mock-tier-status { font-size: 0.65rem; color: #8c9196; display: flex; align-items: center; gap: 0.25rem; }
+    .mock-tier-card.active .mock-tier-status { color: #10b981; font-weight: 600; }
+    .mock-dot { width: 6px; height: 6px; border-radius: 50%; background: #c9cccf; display: inline-block; }
+    .mock-tier-card.active .mock-dot { background: #10b981; animation: pulseDot 1.5s infinite; }
+    @keyframes pulseDot {
+      0% { opacity: 0.3; }
+      50% { opacity: 1; }
+      100% { opacity: 0.3; }
+    }
+    
+    .mock-qty-picker-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      border-top: 1px solid #f1f2f4;
+      padding-top: 1rem;
+    }
+    .mock-qty-label { font-size: 0.85rem; font-weight: 600; color: #202223; }
+    .mock-qty-selector {
+      display: flex;
+      align-items: center;
+      border: 1px solid #c9cccf;
+      border-radius: 6px;
+      overflow: hidden;
+      background: white;
+    }
+    .mock-qty-btn {
+      background: #f6f6f7;
+      border: none;
+      padding: 0.4rem 0.75rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: #6d7175;
+      transition: background 0.2s ease;
+    }
+    .mock-qty-btn:hover { background: #e4e6eb; color: #1a1c1d; }
+    .mock-qty-val {
+      padding: 0.4rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #1a1c1d;
+      min-width: 30px;
+      text-align: center;
+      border-left: 1px solid #c9cccf;
+      border-right: 1px solid #c9cccf;
+    }
+    
+    .mock-calc {
+      background: #f9fafb;
+      border: 1px solid #e1e3e5;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .mock-calc-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: #6d7175;
+    }
+    .mock-calc-row.total {
+      border-top: 1px solid #e1e3e5;
+      padding-top: 0.4rem;
+      margin-top: 0.2rem;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #1a1c1d;
+    }
+    .mock-calc-savings-badge {
+      background: #e2f1e8;
+      color: #108043;
+      border-radius: 4px;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      animation: fadeIn 0.25s ease-out;
+    }
+    
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(5px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
   </style>
 </head>
@@ -336,6 +683,11 @@
     <!-- Dynamic Instruction Panel -->
     <div class="instruction-detail-card" id="instructionPanel">
       <!-- Loaded dynamically by JS -->
+    </div>
+
+    <!-- Dynamic Visual Workspace -->
+    <div class="visual-workspace-container" id="visualWorkspace" style="display: none;">
+      <!-- Populated dynamically via JS -->
     </div>
   </div>
 
@@ -755,8 +1107,374 @@
         }
       });
 
-      renderStepCards();
-      selectStep(1);
+      if (widgetId === 'wholesale') {
+        document.getElementById('stepSectionHeader').style.display = 'none';
+        document.getElementById('stepsGrid').style.display = 'none';
+        document.getElementById('instructionPanel').style.display = 'none';
+        document.getElementById('visualWorkspace').style.display = 'block';
+        initVisualBuilderWorkspace();
+      } else {
+        document.getElementById('stepSectionHeader').style.display = 'block';
+        document.getElementById('stepsGrid').style.display = 'grid';
+        document.getElementById('instructionPanel').style.display = 'block';
+        document.getElementById('visualWorkspace').style.display = 'none';
+        renderStepCards();
+        selectStep(1);
+      }
+    }
+
+    // Visual Builder state variables
+    let builderCurrency = '£';
+    let builderBasePrice = 19.99;
+    let builderTiers = [
+      { minQty: 5, type: 'percent', value: 10 },
+      { minQty: 10, type: 'fixed', value: 11.95 }
+    ];
+    let simulatedQty = 1;
+
+    function initVisualBuilderWorkspace() {
+      const workspace = document.getElementById('visualWorkspace');
+      if (!workspace) return;
+
+      workspace.innerHTML = `
+        <div class="workspace-split">
+          <div class="builder-pane">
+            <h2 class="main-title" style="font-size: 1.3rem; display: flex; align-items: center; gap: 0.5rem; margin: 0 0 0.25rem 0;">
+              <span>🏷️ Visual Tag Generator</span>
+            </h2>
+            <p class="subtitle" style="font-size: 0.85rem; margin-bottom: 1.25rem;">
+              Configure your discount tiers visually. We will compile the correct product tag for you automatically!
+            </p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+              <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                <label class="tier-label" style="font-size: 0.8rem; margin: 0;">Store Currency</label>
+                <select class="select-polaris" id="bld-currency" onchange="updateBuilderCurrency(this.value)">
+                  <option value="£" ${builderCurrency === '£' ? 'selected' : ''}>£ - GBP (Pound)</option>
+                  <option value="$" ${builderCurrency === '$' ? 'selected' : ''}>$ - USD/CAD/AUD</option>
+                  <option value="€" ${builderCurrency === '€' ? 'selected' : ''}>€ - EUR (Euro)</option>
+                  <option value="¥" ${builderCurrency === '¥' ? 'selected' : ''}>¥ - JPY (Yen)</option>
+                  <option value="₹" ${builderCurrency === '₹' ? 'selected' : ''}>₹ - INR (Rupee)</option>
+                </select>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                <label class="tier-label" style="font-size: 0.8rem; margin: 0;">Base Retail Price</label>
+                <input class="input-text-polaris" type="number" id="bld-base-price" step="0.01" value="${builderBasePrice}" oninput="updateBuilderBasePrice(this.value)">
+              </div>
+            </div>
+
+            <h3 class="widget-selector-title" style="font-size: 0.85rem; margin: 1rem 0 0.5rem 0;">Pricing Tiers:</h3>
+            <div class="tier-rules-list" id="bld-tiers-list">
+              <!-- Tier rows populate dynamically -->
+            </div>
+
+            <button type="button" class="btn-polaris btn-secondary" onclick="addBuilderTier()" style="width: fit-content; display: flex; align-items: center; gap: 0.35rem;">
+              <span>+ Add Pricing Tier</span>
+            </button>
+
+            <div class="output-section">
+              <div class="output-header">
+                <span class="output-title">Your Compiled Shopify Tag:</span>
+              </div>
+              <div class="tag-output-box" id="bld-tag-output">
+                bulk-rules=...
+              </div>
+              <button type="button" class="btn-polaris pulsing-btn" onclick="copyCompiledTag()" style="width: 100%; padding: 0.85rem; font-size: 0.9rem;">
+                📋 Copy Tag to Clipboard
+              </button>
+            </div>
+            
+            <div style="margin-top: 1rem; background: #e2f1e8; border: 1px solid #108043; border-radius: 6px; padding: 1rem;">
+              <h4 style="margin: 0 0 0.5rem 0; font-size: 0.85rem; color: #108043; font-weight: 700;">How to activate this:</h4>
+              <ol style="margin: 0; padding-left: 1.25rem; font-size: 0.8rem; color: #108043; line-height: 1.45; display: flex; flex-direction: column; gap: 0.25rem;">
+                <li>Copy the compiled tag using the green button.</li>
+                <li>Go to your **Shopify Admin ➔ Products** and click on your target product.</li>
+                <li>In the **Tags** sidebar field, paste the tag and click **Save**.</li>
+              </ol>
+            </div>
+          </div>
+
+          <div class="preview-pane">
+            <div class="preview-label-tag">Live Storefront Preview</div>
+            
+            <p class="subtitle" style="font-size: 0.8rem; text-align: center; margin-bottom: 0.5rem;">
+              Click tier cards or use quantity buttons to test calculations live!
+            </p>
+
+            <!-- Storefront Widget Mockup Card -->
+            <div class="mock-preview-card">
+              <div class="mock-header">
+                <span class="mock-badge">Wholesale Exclusive</span>
+                <h4 class="mock-title">Wholesale Bulk Pricing</h4>
+                <p class="mock-subheading">Add more to your order and unlock tiered discount rates!</p>
+              </div>
+
+              <div class="mock-grid" id="mock-grid-element">
+                <!-- Tiers grid renders here -->
+              </div>
+
+              <div class="mock-qty-picker-row">
+                <span class="mock-qty-label">Simulated Quantity:</span>
+                <div class="mock-qty-selector">
+                  <button type="button" class="mock-qty-btn" onclick="adjustSimulatedQty(-1)">-</button>
+                  <span class="mock-qty-val" id="mock-qty-display-val">1</span>
+                  <button type="button" class="mock-qty-btn" onclick="adjustSimulatedQty(1)">+</button>
+                </div>
+              </div>
+
+              <div class="mock-calc">
+                <div class="mock-calc-row">
+                  <span>Selected Quantity</span>
+                  <span id="mock-calc-qty">1 item</span>
+                </div>
+                <div class="mock-calc-row">
+                  <span>Unit Price</span>
+                  <span id="mock-calc-unit">£19.99</span>
+                </div>
+                <div class="mock-calc-row total">
+                  <span>Total Price</span>
+                  <div>
+                    <span id="mock-calc-original-total" style="text-decoration: line-through; color: #8c9196; margin-right: 0.5rem; display: none;"></span>
+                    <span id="mock-calc-final-total">£19.99</span>
+                  </div>
+                </div>
+                <div class="mock-calc-savings-badge" id="mock-calc-savings" style="display: none;">
+                  <svg viewBox="0 0 20 20" fill="currentColor" style="width: 14px; height: 14px;">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                  </svg>
+                  <span>You are saving <strong id="mock-savings-val">£0.00</strong> on this order!</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="copied-toast" id="copiedToast">📋 Tag copied to clipboard!</div>
+      `;
+
+      renderBuilderTiersList();
+      updateVisualPreview();
+    }
+
+    function renderBuilderTiersList() {
+      const list = document.getElementById('bld-tiers-list');
+      if (!list) return;
+
+      let html = '';
+      builderTiers.forEach((tier, index) => {
+        html += `
+          <div class="tier-row">
+            <span class="tier-label">Tier ${index + 1}:</span>
+            <div class="tier-input-group">
+              <span style="font-size: 0.8rem; color: #6d7175;">Buy</span>
+              <input class="input-text-polaris input-qty" type="number" min="1" value="${tier.minQty}" onchange="updateTierQty(${index}, this.value)">
+              <span style="font-size: 0.8rem; color: #6d7175;">+ items at</span>
+              <select class="select-polaris" onchange="updateTierType(${index}, this.value)">
+                <option value="percent" ${tier.type === 'percent' ? 'selected' : ''}>% Discount</option>
+                <option value="fixed" ${tier.type === 'fixed' ? 'selected' : ''}>Fixed Price</option>
+              </select>
+              <span style="font-size: 0.85rem; font-weight: 600; color: #6d7175; min-width: 12px; text-align: center;">${tier.type === 'fixed' ? builderCurrency : '%'}</span>
+              <input class="input-text-polaris input-val" type="number" min="0" step="0.01" value="${tier.value}" oninput="updateTierValue(${index}, this.value)">
+            </div>
+            <button type="button" class="btn-delete-tier" onclick="removeBuilderTier(${index})" title="Delete Tier">
+              <svg viewBox="0 0 20 20" fill="currentColor" style="width: 16px; height: 16px;">
+                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+        `;
+      });
+      list.innerHTML = html;
+    }
+
+    function addBuilderTier() {
+      let lastMin = 1;
+      if (builderTiers.length > 0) {
+        lastMin = Math.max(...builderTiers.map(t => t.minQty));
+      }
+      builderTiers.push({ minQty: lastMin + 5, type: 'percent', value: 10 });
+      renderBuilderTiersList();
+      updateVisualPreview();
+    }
+
+    function removeBuilderTier(index) {
+      builderTiers.splice(index, 1);
+      renderBuilderTiersList();
+      updateVisualPreview();
+    }
+
+    function updateTierQty(index, val) {
+      builderTiers[index].minQty = parseInt(val, 10) || 1;
+      updateVisualPreview();
+    }
+
+    function updateTierType(index, val) {
+      builderTiers[index].type = val;
+      renderBuilderTiersList();
+      updateVisualPreview();
+    }
+
+    function updateTierValue(index, val) {
+      builderTiers[index].value = parseFloat(val) || 0;
+      updateVisualPreview();
+    }
+
+    function updateBuilderCurrency(val) {
+      builderCurrency = val;
+      renderBuilderTiersList();
+      updateVisualPreview();
+    }
+
+    function updateBuilderBasePrice(val) {
+      builderBasePrice = parseFloat(val) || 19.99;
+      updateVisualPreview();
+    }
+
+    function adjustSimulatedQty(dir) {
+      simulatedQty = Math.max(1, simulatedQty + dir);
+      document.getElementById('mock-qty-display-val').textContent = simulatedQty;
+      updateVisualPreview();
+    }
+
+    function selectMockTier(qty) {
+      simulatedQty = qty;
+      document.getElementById('mock-qty-display-val').textContent = simulatedQty;
+      updateVisualPreview();
+    }
+
+    function formatMockMoney(amount) {
+      return `${builderCurrency}${amount.toFixed(2)}`;
+    }
+
+    function updateVisualPreview() {
+      const sortedTiers = [...builderTiers].sort((a, b) => a.minQty - b.minQty);
+      
+      let tagStr = 'bulk-rules=';
+      const tagTiers = [];
+      sortedTiers.forEach(t => {
+        const valStr = t.type === 'fixed' ? `${builderCurrency}${t.value.toFixed(2)}` : `${t.value}`;
+        tagTiers.push(`${t.minQty}:${valStr}`);
+      });
+      tagStr += tagTiers.join(';');
+      document.getElementById('bld-tag-output').textContent = tagStr;
+
+      const grid = document.getElementById('mock-grid-element');
+      if (!grid) return;
+
+      if (sortedTiers.length === 0) {
+        grid.innerHTML = '<div style="grid-column: span 2; text-align: center; color: #8c9196; padding: 1rem;">No tiers added yet.</div>';
+        document.getElementById('mock-calc-qty').textContent = `${simulatedQty} item${simulatedQty > 1 ? 's' : ''}`;
+        document.getElementById('mock-calc-unit').textContent = formatMockMoney(builderBasePrice);
+        document.getElementById('mock-calc-final-total').textContent = formatMockMoney(builderBasePrice * simulatedQty);
+        document.getElementById('mock-calc-original-total').style.display = 'none';
+        document.getElementById('mock-calc-savings').style.display = 'none';
+        return;
+      }
+
+      const firstTierMin = sortedTiers[0].minQty;
+      let gridHtml = '';
+
+      if (firstTierMin > 1) {
+        const baseMaxQty = firstTierMin - 1;
+        const isActive = (simulatedQty >= 1 && simulatedQty <= baseMaxQty);
+        gridHtml += `
+          <div class="mock-tier-card ${isActive ? 'active' : ''}" onclick="selectMockTier(1)">
+            <div class="mock-tier-qty">1 ${baseMaxQty > 1 ? `- ${baseMaxQty}` : ''} item${baseMaxQty > 1 ? 's' : ''}</div>
+            <div class="mock-tier-price">${formatMockMoney(builderBasePrice)}</div>
+            <div class="mock-tier-discount">Regular Price</div>
+            <div class="mock-tier-status"><span class="mock-dot"></span> ${isActive ? 'Active' : 'Select'}</div>
+          </div>
+        `;
+      }
+
+      sortedTiers.forEach((tier, index) => {
+        const nextTier = sortedTiers[index + 1];
+        const maxQty = nextTier ? nextTier.minQty - 1 : null;
+        
+        let discountedPrice = 0;
+        let pct = 0;
+        if (tier.type === 'fixed') {
+          discountedPrice = tier.value;
+          pct = Math.round(((builderBasePrice - discountedPrice) / builderBasePrice) * 100);
+        } else {
+          pct = Math.round(tier.value);
+          discountedPrice = builderBasePrice * (1 - pct / 100.0);
+        }
+
+        const discountLabel = pct > 0 ? `${pct}% OFF` : 'Special Price';
+        const isActive = (simulatedQty >= tier.minQty && (maxQty === null || simulatedQty <= maxQty));
+
+        gridHtml += `
+          <div class="mock-tier-card ${isActive ? 'active' : ''}" onclick="selectMockTier(${tier.minQty})">
+            <div class="mock-tier-qty">
+              ${maxQty ? `${tier.minQty} - ${maxQty}` : `${tier.minQty}+`} items
+            </div>
+            <div class="mock-tier-price">${formatMockMoney(discountedPrice)}</div>
+            <div class="mock-tier-discount">${discountLabel}</div>
+            <div class="mock-tier-status"><span class="mock-dot"></span> ${isActive ? 'Active' : 'Select'}</div>
+          </div>
+        `;
+      });
+      grid.innerHTML = gridHtml;
+
+      let activeUnitPrice = builderBasePrice;
+      let activeTier = null;
+
+      sortedTiers.forEach((tier, index) => {
+        const nextTier = sortedTiers[index + 1];
+        const maxQty = nextTier ? nextTier.minQty - 1 : null;
+        if (simulatedQty >= tier.minQty && (maxQty === null || simulatedQty <= maxQty)) {
+          activeTier = tier;
+        }
+      });
+
+      if (activeTier) {
+        if (activeTier.type === 'fixed') {
+          activeUnitPrice = activeTier.value;
+        } else {
+          activeUnitPrice = builderBasePrice * (1 - activeTier.value / 100.0);
+        }
+      }
+
+      const totalOriginal = builderBasePrice * simulatedQty;
+      const totalDiscounted = activeUnitPrice * simulatedQty;
+      const savings = totalOriginal - totalDiscounted;
+
+      document.getElementById('mock-calc-qty').textContent = `${simulatedQty} item${simulatedQty > 1 ? 's' : ''}`;
+      document.getElementById('mock-calc-unit').textContent = formatMockMoney(activeUnitPrice);
+      document.getElementById('mock-calc-final-total').textContent = formatMockMoney(totalDiscounted);
+
+      const originalTotalEl = document.getElementById('mock-calc-original-total');
+      const savingsEl = document.getElementById('mock-calc-savings');
+
+      if (savings > 0.005) {
+        if (originalTotalEl) {
+          originalTotalEl.textContent = formatMockMoney(totalOriginal);
+          originalTotalEl.style.display = 'inline';
+        }
+        if (savingsEl) {
+          document.getElementById('mock-savings-val').textContent = formatMockMoney(savings);
+          savingsEl.style.display = 'flex';
+        }
+      } else {
+        if (originalTotalEl) originalTotalEl.style.display = 'none';
+        if (savingsEl) savingsEl.style.display = 'none';
+      }
+    }
+
+    function copyCompiledTag() {
+      const tagText = document.getElementById('bld-tag-output').textContent.trim();
+      navigator.clipboard.writeText(tagText).then(() => {
+        const toast = document.getElementById('copiedToast');
+        if (toast) {
+          toast.style.display = 'block';
+          setTimeout(() => {
+            toast.style.display = 'none';
+          }, 2000);
+        }
+      }).catch(err => {
+        console.error('Clipboard copy failed:', err);
+      });
     }
 
     function renderStepCards() {
