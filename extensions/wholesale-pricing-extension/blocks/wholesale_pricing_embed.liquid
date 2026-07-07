@@ -170,6 +170,19 @@
         if (qtyInput) break;
       }
 
+      // Fallback: If theme does not have a quantity input on the page, inject a hidden one
+      if (!qtyInput) {
+        const productForm = document.querySelector("form[action*='/cart/add']") || document.querySelector('.product-form form');
+        if (productForm) {
+          const hiddenQty = document.createElement('input');
+          hiddenQty.type = 'hidden';
+          hiddenQty.name = 'quantity';
+          hiddenQty.value = '1';
+          productForm.appendChild(hiddenQty);
+          qtyInput = hiddenQty;
+        }
+      }
+
       const variantInputSelectors = [
         'select[name="id"]',
         'input[name="id"]',
