@@ -58,10 +58,32 @@
             
             if (total === 0) {
               container.style.display = 'none';
+              if (position === 'top_banner') {
+                document.body.style.marginTop = '0px';
+                const header = document.querySelector('header') || document.querySelector('.header') || document.querySelector('#shopify-section-header');
+                if (header) {
+                  header.style.top = '';
+                }
+              }
               return;
             }
 
             container.style.display = 'block';
+
+            if (position === 'top_banner') {
+              setTimeout(() => {
+                const barHeight = container.offsetHeight || 44;
+                document.body.style.marginTop = `${barHeight}px`;
+                const header = document.querySelector('header') || document.querySelector('.header') || document.querySelector('#shopify-section-header');
+                if (header) {
+                  const headerStyle = window.getComputedStyle(header);
+                  if (headerStyle.position === 'fixed' || headerStyle.position === 'sticky') {
+                    header.style.top = `${barHeight}px`;
+                    header.style.transition = 'top 0.3s ease';
+                  }
+                }
+              }, 50);
+            }
 
             if (total >= threshold) {
               fillEl.style.width = '100%';
