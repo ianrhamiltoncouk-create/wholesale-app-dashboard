@@ -327,8 +327,9 @@
     function checkAndResetSessionLock() {
       const storedCount = parseInt(sessionStorage.getItem('last_cart_count') || '0', 10);
       if (cartItemCount > storedCount) {
-        // Cart count increased (either via reload or AJAX)! Clear the lock.
+        // Cart count increased (either via reload or AJAX)! Clear the lock and memory flag.
         sessionStorage.removeItem('quote_modal_shown');
+        hasShownExitIntent = false;
       }
       sessionStorage.setItem('last_cart_count', cartItemCount.toString());
     }
