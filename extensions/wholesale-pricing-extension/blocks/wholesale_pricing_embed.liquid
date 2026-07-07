@@ -38,6 +38,18 @@
       endif
     endif
 
+    # Parse product-specific pricing rule tags (e.g. bulk-rules=5:10,10:20)
+    assign active_tier_config = block.settings.tier_config | default: '5:10, 10:15, 20:20'
+    for tag in product.tags
+      if tag contains 'bulk-rules=' or tag contains 'bulk-rules ='
+        assign tag_parts = tag | split: '='
+        if tag_parts.size > 1
+          assign active_tier_config = tag_parts[1] | strip
+          break
+        endif
+      endif
+    endfor
+
     assign current_variant = product.selected_or_first_available_variant
   -%}
 
@@ -223,7 +235,7 @@
       }
 
       // 1. Parse text configuration string into pricing array
-      const configStr = "{{ block.settings.tier_config | default: '5:10, 10:15, 20:20' }}";
+      const configStr = "{{ active_tier_config | escape }}";
       
       function parseTiers(str) {
         const parsed = [];
