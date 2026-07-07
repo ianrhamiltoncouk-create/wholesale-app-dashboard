@@ -234,17 +234,18 @@
     <!-- Header card -->
     <div class="header-card">
       <span class="badge">App Control Center</span>
-      <h1 class="main-title">Wholesale & Recovery Portal</h1>
-      <p class="subtitle">Select a widget type below to configure its settings, view guides, and deep-link directly to your Shopify sections.</p>
+      <h1 class="main-title">Storefront Utility Suite</h1>
+      <p class="subtitle">Welcome to your app dashboard! Select a utility tab below to configure settings, view integration guides, and open direct links.</p>
     </div>
 
     <!-- Widgets Tab Bar -->
     <div class="tabs-container">
-      <button class="tab-button active" id="tab-wholesale" onclick="switchWidgetTab('wholesale')">🏷️ Wholesale Pricing Grid</button>
-      <button class="tab-button" id="tab-recovery" onclick="switchWidgetTab('recovery')">🛒 Cart Abandonment Recovery</button>
+      <button class="tab-button active" id="tab-wholesale" onclick="switchWidgetTab('wholesale')">🏷️ Wholesale Tiers</button>
+      <button class="tab-button" id="tab-recovery" onclick="switchWidgetTab('recovery')">🛒 Cart Recovery</button>
+      <button class="tab-button" id="tab-uploader" onclick="switchWidgetTab('uploader')">📁 Custom File Uploader</button>
     </div>
 
-    <!-- Active Step Cards Panel (Populated by JS) -->
+    <!-- Active Step Cards Panel -->
     <div class="grid-setup" id="stepsGrid">
       <!-- Grid items loaded dynamically -->
     </div>
@@ -270,12 +271,13 @@
     const customizerUrl = shop ? `https://admin.shopify.com/store/${shopId}/themes/current/editor?context=apps` : 'https://admin.shopify.com/store/themes/current/editor?context=apps';
     const customersUrl = shop ? `https://admin.shopify.com/store/${shopId}/customers` : 'https://admin.shopify.com/store/customers';
     const discountsUrl = shop ? `https://admin.shopify.com/store/${shopId}/discounts` : 'https://admin.shopify.com/store/discounts';
+    const ordersUrl = shop ? `https://admin.shopify.com/store/${shopId}/orders` : 'https://admin.shopify.com/store/orders';
 
     // Current State
     let activeTab = 'wholesale';
     let activeStep = 1;
 
-    // Wholesale configuration data
+    // 1. Wholesale Tiers Data
     const wholesaleSteps = [
       {
         title: "Open Editor",
@@ -370,7 +372,7 @@
       }
     };
 
-    // Recovery configuration data
+    // 2. Cart Recovery Data
     const recoverySteps = [
       {
         title: "Enable Recovery",
@@ -427,15 +429,87 @@
         why: {
           badge: "Why do this?",
           title: "Validate the Customer Experience",
-          desc: "Testing ensures that both the direct checkout page button and the exit-intent popup behave perfectly before your wholesalers use them."
+          desc: "Testing ensures that both the direct checkout page button and the exit-intent popup behave perfectly before your storefront visitors use them."
         },
         how: {
           badge: "How to test",
           title: "Simulate Cart Abandonment",
-          desc: `1. Open a new private browser window and visit your storefront.<br>
+          desc: `1. Open a new window and visit your storefront.<br>
           2. Add any product to your cart.<br>
           3. **Test Cart Page Button:** Go to <code>/cart</code>. You should see a secondary button labeled <strong>"Email Me My Cart Link"</strong> automatically placed below your checkout button. Click it to open the form.<br>
           4. **Test Exit-Intent:** Navigate to any page with items in your cart. Move your mouse cursor rapidly to the top of the browser tab (simulating closing the tab). A beautiful popup modal will slide open prompting you to save your items!`
+        }
+      }
+    };
+
+    // 3. Custom File Uploader Data
+    const uploaderSteps = [
+      {
+        title: "Enable Uploader",
+        desc: "Open the Theme Editor and turn the File Uploader toggle ON.",
+        btnHtml: `<a href="${customizerUrl}" class="btn-polaris" target="_top">Open Editor</a>`
+      },
+      {
+        title: "Configure Fields",
+        desc: "Set allowed extensions, custom labels, and required flags.",
+        btnHtml: `<button class="btn-polaris btn-secondary" onclick="selectStep(2)">Show settings guide</button>`
+      },
+      {
+        title: "Receive Files",
+        desc: "Open your Orders list to view custom files sent by clients.",
+        btnHtml: `<a href="${ordersUrl}" class="btn-polaris btn-secondary" target="_top">Open Orders</a>`
+      }
+    ];
+
+    const uploaderGuides = {
+      1: {
+        title: "Step 1: Open Theme Customizer & Toggle Custom File Uploader",
+        why: {
+          badge: "Why do this?",
+          title: "Inject Drag & Drop Uploader on Product Pages",
+          desc: "Activating the Custom File Uploader App Embed auto-injects a modern, drag-and-drop file upload box directly above your product page forms. Customers can upload designs, t-shirt artwork, or drawings directly with their purchase."
+        },
+        how: {
+          badge: "How to do it?",
+          title: "Enable App Embed",
+          desc: "1. Click the green <strong>Open Editor</strong> button in Step 1.<br>2. At the top-left of the Theme Customizer window, click the <strong>4th icon</strong> (the shapes icon) to open the <strong>App embeds</strong> sidebar.<br>3. Toggle **Custom File Uploader** to **ON**.<br>4. Click **Save** in the top right."
+        }
+      },
+      2: {
+        title: "Step 2: Customize Uploader Labels & Requirements",
+        why: {
+          badge: "Why do this?",
+          title: "Adapt the Uploader to Your Specific Products",
+          desc: "You can change labels to fit your business type (e.g. 'Upload Engraving Logo' or 'Upload Drawing'). You can also enforce validation, like blocking the 'Add to Cart' button unless they upload a file."
+        },
+        how: {
+          badge: "How to do it?",
+          title: "Edit Settings Sidebar",
+          desc: `1. Click the <strong>Open Editor</strong> button in Step 1.<br>
+          2. Under the App embeds list, click directly on the words <strong>"Custom File Uploader"</strong>.<br>
+          3. On the right-hand side of your screen, edit:
+             * **Upload Box Label:** Change the heading text above the uploader.<br>
+             * **Allowed File Types:** Enter file extensions like <code>png, jpg, pdf</code>.<br>
+             * **File Upload Required:** Check this box to force customers to upload an image before they can add to cart.<br>
+             * **Show Instruction Textarea:** Enable a text input so customers can type custom instructions (e.g. text for engravings).<br>
+          4. Click **Save** in the top-right corner.`
+        }
+      },
+      3: {
+        title: "Step 3: Download Custom Files from Shopify Orders",
+        why: {
+          badge: "Why do this?",
+          title: "Process Custom Work Orders Efficiently",
+          desc: "Because we integrate directly with Shopify's product attributes, you do not need an external server or file storage host. Shopify securely uploads, hosts, and stores the customer's design, linking it directly to the customer's order file."
+        },
+        how: {
+          badge: "How to process",
+          title: "Downloading Custom Files",
+          desc: `1. Click the <strong>Open Orders</strong> button in Step 3.<br>
+          2. Click on the customer order you want to process.<br>
+          3. Look in the order details under the product line item. You will see a clickable text hyperlink showing the file name (e.g. <code>custom-logo.png</code>).<br>
+          4. **Click the link** to download the high-resolution image directly onto your computer for printing or production!<br>
+          5. If they added instructions (like engraving texts), it will also be listed right beside the download link.`
         }
       }
     };
@@ -447,6 +521,7 @@
       // Update Tab Button styles
       document.getElementById('tab-wholesale').classList.toggle('active', tabName === 'wholesale');
       document.getElementById('tab-recovery').classList.toggle('active', tabName === 'recovery');
+      document.getElementById('tab-uploader').classList.toggle('active', tabName === 'uploader');
       
       renderStepCards();
       selectStep(1);
@@ -454,7 +529,10 @@
 
     function renderStepCards() {
       const grid = document.getElementById('stepsGrid');
-      const steps = activeTab === 'wholesale' ? wholesaleSteps : recoverySteps;
+      let steps = [];
+      if (activeTab === 'wholesale') steps = wholesaleSteps;
+      else if (activeTab === 'recovery') steps = recoverySteps;
+      else if (activeTab === 'uploader') steps = uploaderSteps;
       
       let html = '';
       steps.forEach((step, index) => {
@@ -476,7 +554,11 @@
       activeStep = stepNum;
       
       // Toggle active classes on cards
-      const stepsCount = activeTab === 'wholesale' ? wholesaleSteps.length : recoverySteps.length;
+      let stepsCount = 0;
+      if (activeTab === 'wholesale') stepsCount = wholesaleSteps.length;
+      else if (activeTab === 'recovery') stepsCount = recoverySteps.length;
+      else if (activeTab === 'uploader') stepsCount = uploaderSteps.length;
+
       for (let i = 1; i <= stepsCount; i++) {
         const card = document.getElementById(`step-${i}-card`);
         if (card) {
@@ -486,7 +568,10 @@
 
       // Update instructions panel content
       const panel = document.getElementById('instructionPanel');
-      const data = activeTab === 'wholesale' ? wholesaleGuides[stepNum] : recoveryGuides[stepNum];
+      let data = null;
+      if (activeTab === 'wholesale') data = wholesaleGuides[stepNum];
+      else if (activeTab === 'recovery') data = recoveryGuides[stepNum];
+      else if (activeTab === 'uploader') data = uploaderGuides[stepNum];
       
       let html = `
         <h3 class="guide-title">

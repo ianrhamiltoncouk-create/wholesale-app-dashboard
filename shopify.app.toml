@@ -1,6 +1,6 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-name = "Whole Sale orders "
+name = "Storefront Suite: Wholesale & Uploads"
 client_id = "c6fbf259f256c915a03d8cb1416ff624"
 application_url = "https://ianrhamiltoncouk-create.github.io/wholesale-app-dashboard"
 embedded = true
