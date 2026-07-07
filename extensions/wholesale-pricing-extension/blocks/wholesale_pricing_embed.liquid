@@ -247,9 +247,13 @@
           let rawValue = parts[1] ? parts[1].trim() : '';
           let isFixed = false;
           
-          if (rawValue.includes('$')) {
-            isFixed = true;
-            rawValue = rawValue.replace('$', '');
+          const currencySymbols = ['$', '£', '€', '¥', '₹'];
+          for (let symbol of currencySymbols) {
+            if (rawValue.includes(symbol)) {
+              isFixed = true;
+              rawValue = rawValue.replace(symbol, '');
+              break;
+            }
           }
           
           const value = parseFloat(rawValue);
