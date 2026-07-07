@@ -390,19 +390,20 @@
     }
 
     {% if block.settings.enable_exit_intent %}
+      const isDesignMode = window.Shopify && window.Shopify.designMode;
+
       // 1. Intercept browser tab/window close button
       window.addEventListener('beforeunload', function(e) {
-        if (cartItemCount > 0 && !sessionStorage.getItem('quote_modal_shown') && !hasShownExitIntent) {
+        const isLocked = sessionStorage.getItem('quote_modal_shown');
+        if (cartItemCount > 0 && (isDesignMode || !isLocked) && !hasShownExitIntent) {
           e.preventDefault();
           
-          // Trigger our custom HTML modal in the background if they decide to stay
           setTimeout(function() {
             hasShownExitIntent = true;
             sessionStorage.setItem('quote_modal_shown', 'true');
             openCartQuoteModal();
           }, 100);
 
-          // Standard browser exit warning message
           e.returnValue = 'You have items in your cart! Would you like us to email you a checkout link?';
           return e.returnValue;
         }
@@ -410,7 +411,8 @@
 
       // 2. Always listen to exit intent, but evaluate the session lock dynamically inside the event
       document.addEventListener('mouseleave', function(e) {
-        if (cartItemCount > 0 && !sessionStorage.getItem('quote_modal_shown') && !hasShownExitIntent) {
+        const isLocked = sessionStorage.getItem('quote_modal_shown');
+        if (cartItemCount > 0 && (isDesignMode || !isLocked) && !hasShownExitIntent) {
           hasShownExitIntent = true;
           sessionStorage.setItem('quote_modal_shown', 'true');
           openCartQuoteModal();
@@ -418,7 +420,8 @@
       });
 
       document.addEventListener('mouseout', function(e) {
-        if (e.clientY < 20 && cartItemCount > 0 && !sessionStorage.getItem('quote_modal_shown') && !hasShownExitIntent) {
+        const isLocked = sessionStorage.getItem('quote_modal_shown');
+        if (e.clientY < 20 && cartItemCount > 0 && (isDesignMode || !isLocked) && !hasShownExitIntent) {
           hasShownExitIntent = true;
           sessionStorage.setItem('quote_modal_shown', 'true');
           openCartQuoteModal();
