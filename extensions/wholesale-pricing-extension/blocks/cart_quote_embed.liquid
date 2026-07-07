@@ -322,6 +322,16 @@
     const isCartPage = window.location.pathname === '/cart' || window.location.pathname.endsWith('/cart');
     const enableCartBtn = {{ block.settings.enable_cart_page_button | json }};
 
+    let cartItemCount = {{ cart.item_count | default: 0 }};
+    
+    // Update the cart count in the background after page loads to ensure accuracy
+    fetch('/cart.js')
+      .then(res => res.json())
+      .then(cart => {
+        cartItemCount = cart.item_count;
+      })
+      .catch(err => console.error('Error fetching background cart count', err));
+
     if (enableCartBtn && isCartPage) {
       const checkoutBtnSelectors = [
         'button[name="checkout"]',
@@ -354,17 +364,21 @@
 
     {% if block.settings.enable_exit_intent %}
       if (!sessionStorage.getItem('quote_modal_shown')) {
+        // Trigger instantly when mouse leaves the document window area
+        document.addEventListener('mouseleave', function(e) {
+          if (cartItemCount > 0 && !hasShownExitIntent) {
+            hasShownExitIntent = true;
+            sessionStorage.setItem('quote_modal_shown', 'true');
+            openCartQuoteModal();
+          }
+        });
+
+        // Fallback for fast cursor exit tracking
         document.addEventListener('mouseout', function(e) {
-          if (e.clientY < 20) {
-            fetch('/cart.js')
-              .then(res => res.json())
-              .then(cart => {
-                if (cart.item_count > 0 && !hasShownExitIntent) {
-                  hasShownExitIntent = true;
-                  sessionStorage.setItem('quote_modal_shown', 'true');
-                  openCartQuoteModal();
-                }
-              });
+          if (e.clientY < 20 && cartItemCount > 0 && !hasShownExitIntent) {
+            hasShownExitIntent = true;
+            sessionStorage.setItem('quote_modal_shown', 'true');
+            openCartQuoteModal();
           }
         });
       }
