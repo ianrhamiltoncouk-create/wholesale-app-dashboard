@@ -325,10 +325,16 @@
     let cartItemCount = {{ cart.item_count | default: 0 }};
     
     function refreshCartCount() {
+      const prevCount = cartItemCount;
       fetch('/cart.js')
         .then(res => res.json())
         .then(cart => {
           cartItemCount = cart.item_count;
+          // If customer added more items, reset the exit-intent lock so they can be prompted again
+          if (cartItemCount > prevCount) {
+            sessionStorage.removeItem('quote_modal_shown');
+            hasShownExitIntent = false;
+          }
         })
         .catch(err => console.error('Error fetching background cart count', err));
     }
