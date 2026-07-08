@@ -510,7 +510,7 @@
       margin-bottom: 1rem;
     }
     .mock-badge {
-      background: linear-gradient(135deg, #10b981, #059669);
+      background: var(--mock-accent, #10b981);
       color: white;
       font-size: 0.65rem;
       font-weight: 700;
@@ -520,7 +520,7 @@
       letter-spacing: 0.05em;
       display: inline-block;
       margin-bottom: 0.35rem;
-      box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+      box-shadow: 0 2px 4px rgba(16, 185, 129, 0.1);
     }
     .mock-title { font-size: 1rem; font-weight: 700; color: #1a1c1d; margin: 0 0 0.25rem 0; }
     .mock-subheading { font-size: 0.75rem; color: #6d7175; margin: 0; }
@@ -546,18 +546,18 @@
       position: relative;
     }
     .mock-tier-card.active {
-      border-color: #10b981;
-      background: rgba(16, 185, 129, 0.02);
-      box-shadow: 0 0 0 1px #10b981;
+      border-color: var(--mock-accent, #10b981);
+      background: var(--mock-accent-light, rgba(16, 185, 129, 0.02));
+      box-shadow: 0 0 0 1px var(--mock-accent, #10b981);
     }
     .mock-tier-qty { font-size: 0.75rem; font-weight: 700; color: #6d7175; }
-    .mock-tier-card.active .mock-tier-qty { color: #10b981; }
+    .mock-tier-card.active .mock-tier-qty { color: var(--mock-accent, #10b981); }
     .mock-tier-price { font-size: 1.1rem; font-weight: 700; color: #1a1c1d; }
-    .mock-tier-discount { font-size: 0.7rem; font-weight: 600; color: #10b981; }
+    .mock-tier-discount { font-size: 0.7rem; font-weight: 600; color: var(--mock-accent, #10b981); }
     .mock-tier-status { font-size: 0.65rem; color: #8c9196; display: flex; align-items: center; gap: 0.25rem; }
-    .mock-tier-card.active .mock-tier-status { color: #10b981; font-weight: 600; }
+    .mock-tier-card.active .mock-tier-status { color: var(--mock-accent, #10b981); font-weight: 600; }
     .mock-dot { width: 6px; height: 6px; border-radius: 50%; background: #c9cccf; display: inline-block; }
-    .mock-tier-card.active .mock-dot { background: #10b981; animation: pulseDot 1.5s infinite; }
+    .mock-tier-card.active .mock-dot { background: var(--mock-accent, #10b981); animation: pulseDot 1.5s infinite; }
     @keyframes pulseDot {
       0% { opacity: 0.3; }
       50% { opacity: 1; }
@@ -627,8 +627,8 @@
       color: #1a1c1d;
     }
     .mock-calc-savings-badge {
-      background: #e2f1e8;
-      color: #108043;
+      background: var(--mock-accent-light-bg, #e2f1e8);
+      color: var(--mock-accent, #108043);
       border-radius: 4px;
       padding: 0.35rem 0.75rem;
       font-size: 0.75rem;
@@ -1125,11 +1125,21 @@
     // Visual Builder state variables
     let builderCurrency = '£';
     let builderBasePrice = 19.99;
+    let builderAccentColor = '#10b981';
     let builderTiers = [
       { minQty: 5, type: 'percent', value: 10 },
       { minQty: 10, type: 'fixed', value: 11.95 }
     ];
     let simulatedQty = 1;
+
+    function updateBuilderColor(val) {
+      builderAccentColor = val;
+      const picker = document.getElementById('bld-color-picker');
+      const text = document.getElementById('bld-color-text');
+      if (picker) picker.value = val;
+      if (text) text.value = val;
+      updateVisualPreview();
+    }
 
     function initVisualBuilderWorkspace() {
       const workspace = document.getElementById('visualWorkspace');
@@ -1145,7 +1155,7 @@
               Configure your discount tiers visually. We will compile the correct product tag for you automatically!
             </p>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
               <div style="display: flex; flex-direction: column; gap: 0.35rem;">
                 <label class="tier-label" style="font-size: 0.8rem; margin: 0;">Store Currency</label>
                 <select class="select-polaris" id="bld-currency" onchange="updateBuilderCurrency(this.value)">
@@ -1159,6 +1169,13 @@
               <div style="display: flex; flex-direction: column; gap: 0.35rem;">
                 <label class="tier-label" style="font-size: 0.8rem; margin: 0;">Base Retail Price</label>
                 <input class="input-text-polaris" type="number" id="bld-base-price" step="0.01" value="${builderBasePrice}" oninput="updateBuilderBasePrice(this.value)">
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+                <label class="tier-label" style="font-size: 0.8rem; margin: 0;">Accent Color</label>
+                <div style="display: flex; align-items: center; gap: 0.5rem; height: 38px;">
+                  <input type="color" id="bld-color-picker" value="${builderAccentColor}" oninput="updateBuilderColor(this.value)" style="border: 1px solid #c9cccf; border-radius: 6px; width: 44px; height: 100%; padding: 2px; cursor: pointer; background: white; box-sizing: border-box;">
+                  <input type="text" id="bld-color-text" value="${builderAccentColor}" oninput="updateBuilderColor(this.value)" style="flex-grow: 1; min-width: 0; height: 100%;" class="input-text-polaris">
+                </div>
               </div>
             </div>
 
@@ -1346,6 +1363,17 @@
     }
 
     function updateVisualPreview() {
+      const mockCard = document.querySelector('.mock-preview-card');
+      if (mockCard) {
+        mockCard.style.setProperty('--mock-accent', builderAccentColor);
+        const hex = builderAccentColor.replace('#', '');
+        const r = parseInt(hex.substring(0, 2), 16) || 0;
+        const g = parseInt(hex.substring(2, 4), 16) || 0;
+        const b = parseInt(hex.substring(4, 6), 16) || 0;
+        mockCard.style.setProperty('--mock-accent-light', `rgba(${r}, ${g}, ${b}, 0.03)`);
+        mockCard.style.setProperty('--mock-accent-light-bg', `rgba(${r}, ${g}, ${b}, 0.08)`);
+      }
+
       const sortedTiers = [...builderTiers].sort((a, b) => a.minQty - b.minQty);
       
       let tagStr = 'bulk-rules=';
