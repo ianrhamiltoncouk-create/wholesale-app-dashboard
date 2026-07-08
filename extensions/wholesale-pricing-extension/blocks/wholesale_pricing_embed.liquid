@@ -7,6 +7,26 @@
 
 {% if request.page_type == 'product' %}
   {{ 'storefront-suite.css' | asset_url | stylesheet_tag }}
+
+  <style>
+    #wholesale-widget-{{ block.id }} .wholesale-badge-glow,
+    #wholesale-widget-{{ block.id }} .wholesale-progress-bar-fill {
+      background: {{ block.settings.accent_color | default: '#10b981' }} !important;
+    }
+    #wholesale-widget-{{ block.id }} .wholesale-tier-card.active {
+      border-color: {{ block.settings.accent_color | default: '#10b981' }} !important;
+      background: {{ block.settings.accent_color | default: '#10b981' }}05 !important;
+      box-shadow: 0 0 0 1px {{ block.settings.accent_color | default: '#10b981' }} !important;
+    }
+    #wholesale-widget-{{ block.id }} .wholesale-tier-card.active .wholesale-tier-qty,
+    #wholesale-widget-{{ block.id }} .wholesale-tier-discount,
+    #wholesale-widget-{{ block.id }} .wholesale-progress-hint strong {
+      color: {{ block.settings.accent_color | default: '#10b981' }} !important;
+    }
+    #wholesale-widget-{{ block.id }} .wholesale-tier-card.active .status-dot {
+      background-color: {{ block.settings.accent_color | default: '#10b981' }} !important;
+    }
+  </style>
   {%- liquid
     assign show_widget = false
     if block.settings.only_wholesale_tagged == false and customer
@@ -556,6 +576,12 @@
       "label": "Wholesale Tiers (Qty:Discount%)",
       "default": "5:10, 10:15, 20:20",
       "info": "Format: MinQty:DiscountPercentage separated by commas. E.g. '5:10, 10:15, 20:20' means: 5+ items gets 10% off, 10+ items gets 15% off, 20+ items gets 20% off. You can add as many tiers as you want!"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Brand Accent Color",
+      "default": "#10b981"
     }
   ]
 }
